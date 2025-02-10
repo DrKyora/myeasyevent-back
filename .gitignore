@@ -1,2 +1,2 @@
 /vendor/
-localhost.env
+*.env
