@@ -1,0 +1,10 @@
+{
+    "users":[
+        {
+            "firstName": "Remi",
+            "email": "delgutte.remi@gmail.com",
+            "password": "ABCinfo123*",
+            "isAdmin": true
+        }
+    ]
+}

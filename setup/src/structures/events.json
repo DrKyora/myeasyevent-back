@@ -1,0 +1,93 @@
+{
+    "tableName": "events",
+    "columns" : [
+        {
+            "nameCol": "userId",
+            "type": "CHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "addressId",
+            "type": "CHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "title",
+            "type": "VARCHAR(255)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "startedDate",
+            "type": "DATETIME",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "endingDate",
+            "type": "DATETIME",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "publishDate",
+            "type": "DATETIME",
+            "nullable": true,
+            "default": null
+        },
+        {
+            "nameCol": "openReservation",
+            "type": "DATETIME",
+            "nullable": true,
+            "default": null
+        },
+        {
+            "nameCol": "status",
+            "type": "ENUM",
+            "values": [
+                "Save",
+                "Posted"
+            ],
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "maxReservation",
+            "type": "INT",
+            "nullable": true,
+            "default": null
+        },
+        {
+            "nameCol": "price",
+            "type": "INT",
+            "nullable": true,
+            "default": null
+        },
+        {
+            "nameCol": "shareLink",
+            "type": "VARCHAR(255)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "ageRestriction",
+            "type": "ENUM",
+            "values": [
+                "Tout publique",
+                "12+",
+                "16+",
+                "18+"
+            ],
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "default": false
+        }
+    ]
+}

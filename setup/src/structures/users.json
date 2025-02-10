@@ -1,0 +1,41 @@
+{
+    "tableName": "users",
+    "columns": [
+        {
+            "nameCol": "lastName",
+            "type": "VARCHAR(100)",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "nameCol": "firstName",
+            "type": "VARCHAR(100)",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "nameCol": "email",
+            "type": "VARCHAR(100)",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "nameCol": "password",
+            "type": "VARCHAR(500)",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "nameCol": "isAdmin",
+            "type": "BOOLEAN",
+            "nullable": true,
+            "default": 0
+          },
+          {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable": true,
+            "default": 0
+          }
+    ]
+}
