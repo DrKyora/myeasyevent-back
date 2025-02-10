@@ -41,7 +41,7 @@
             "nameCol": "isDeleted",
             "type": "BOOLEAN",
             "nullable":true,
-            "default": 0
+            "default": false
         }
     ]
 }
