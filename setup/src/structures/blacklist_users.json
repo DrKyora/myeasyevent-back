@@ -1,0 +1,23 @@
+{
+    "tableName": "blacklist_users",
+    "columns": [
+        {
+            "nameCol": "userId",
+            "type": "VARCAHR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "date",
+            "type": "DATETIME",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}

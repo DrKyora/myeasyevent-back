@@ -1,0 +1,47 @@
+{
+    "tableName": "address_to_event",
+    "columns": [
+        {
+            "nameCol": "street",
+            "type": "VARCHAR(100)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "streeNumber",
+            "type": "VARCHAR(100)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "complement",
+            "type": "VARCHAR(500)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "zipCode",
+            "type": "VARCHAR(10)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "city",
+            "type": "VARCHAR(100)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol":"country",
+            "type": "VARCHAR(100)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}

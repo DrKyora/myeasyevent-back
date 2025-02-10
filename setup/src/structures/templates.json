@@ -1,0 +1,23 @@
+{
+    "tableName" : "templates",
+    "columns": [
+        {
+            "nameCol": "description",
+            "type": "VARCHAR(500)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "html",
+            "type": "TEXT",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}

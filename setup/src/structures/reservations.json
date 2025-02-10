@@ -1,6 +1,6 @@
 {
-    "tableName": "users",
-    "columns": [
+    "tableName": "reservations",
+    "columns":[
         {
             "nameCol": "lastName",
             "type": "VARCHAR(100)",
@@ -20,21 +20,21 @@
             "default": null
         },
         {
-            "nameCol": "password",
-            "type": "VARCHAR(500)",
-            "nullable": true,
+            "nameCol": "birthDate",
+            "type": "DATETIME",
+            "nullable": false,
             "default": null
         },
         {
-            "nameCol": "isAdmin",
-            "type": "BOOLEAN",
-            "nullable": true,
-            "default": 0
+            "nameCol": "dataReservation",
+            "type": "DATETIME",
+            "nullable": false,
+            "default": null
         },
         {
             "nameCol": "isDeleted",
             "type": "BOOLEAN",
-            "nullable": true,
+            "nullable":true,
             "default": 0
         }
     ]

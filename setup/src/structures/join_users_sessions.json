@@ -1,0 +1,23 @@
+{
+    "tableName": "join_users_sessions",
+    "columns": [
+        {
+            "nameCol": "userId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "sessionId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}

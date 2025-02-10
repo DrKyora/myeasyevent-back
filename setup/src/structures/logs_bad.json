@@ -1,0 +1,29 @@
+{
+    "tableName": "logs_bad",
+    "columns": [
+        {
+            "nameCol": "ip",
+            "type": "VARCHAR(50)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "userId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "log_date",
+            "type": "DATETIME",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "tableName": "images_to_templates",
+    "columns": [
+        {
+            "nameCol": "link",
+            "type": "VARCHAR(50)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}

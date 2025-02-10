@@ -1,0 +1,17 @@
+{
+    "tableName": "categories",
+    "columns": [
+        {
+            "nameCol": "name",
+            "type": "VARCHAR(250)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}

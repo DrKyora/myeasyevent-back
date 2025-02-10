@@ -1,0 +1,17 @@
+{
+    "tableName": "sessions",
+    "columns": [
+        {
+            "nameCol": "lastAction",
+            "type": "DATETIME",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": 0
+        }
+    ]
+}
