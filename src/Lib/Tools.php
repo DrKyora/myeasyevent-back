@@ -20,7 +20,7 @@ class Tools
         fputs(stream: $logFile, data: $log);
     }
 
-    public static function myErrorHandler($errno, $errstr, $errfile, $errline): void
+    public function myErrorHandler($errno, $errstr, $errfile, $errline): void
     {
         $messageTitle =  "<span style=\"color: red;\">Erreur PHP :</span> [$errno] $errstr<br>";
         $messageContent = " Erreur à la ligne { $errline } 
@@ -65,4 +65,5 @@ class Tools
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
+
 }
