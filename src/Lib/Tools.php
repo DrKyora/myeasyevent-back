@@ -45,4 +45,24 @@ class Tools
         $array[$key] = $value;
         return $array;
     }
+    
+    public function encrypt_decrypt(string $action, string $stringToTreat): string|ResponseError
+    {
+        try {
+            $output = false;
+            $encrypt_method = "AES-256-CBC";
+
+            $key = hash(algo: 'sha256', data: $_ENV['ENCRYPT_KEY']);
+            $iv = substr(string: hash(algo: 'sha256', data: $_ENV['SECRET_IV']), offset: 0, length: 16);
+            if ($action == 'encrypt') {
+                $output = openssl_encrypt(data: $stringToTreat, cipher_algo: $encrypt_method, passphrase: $key, options: 0, iv: $iv);
+                $output = base64_encode(string: $output);
+            } else if ($action == 'decrypt') {
+                $output = openssl_decrypt(data: base64_decode(string: $stringToTreat), cipher_algo: $encrypt_method, passphrase: $key, options: 0, iv: $iv);
+            }
+            return $output;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
 }

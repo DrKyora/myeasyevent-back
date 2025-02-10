@@ -26,7 +26,6 @@ function loadEnv($path)
 }
 
 
-
 // Appel de la fonction pour charger les variables d'environnement
 switch ($_SERVER['SERVER_NAME']) {
     case 'localhost':
