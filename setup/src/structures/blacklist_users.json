@@ -3,7 +3,7 @@
     "columns": [
         {
             "nameCol": "userId",
-            "type": "VARCAHR(16)",
+            "type": "VARCHAR(16)",
             "nullable": false,
             "default": null
         },

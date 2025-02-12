@@ -1,11 +1,13 @@
 <?php
 
+define(constant_name: 'LOG_ALL_PHP', value: true);
 
 use App\Lib\Tools;
 
 require_once __DIR__ . '/src/Lib/Tools.php';
+ $tools = new Tools();
 
-set_error_handler(callback: [Tools::class, "myErrorHandler"]);
+set_error_handler(callback: [$tools, "myErrorHandler"]);
 
 
 function loadEnv($path)

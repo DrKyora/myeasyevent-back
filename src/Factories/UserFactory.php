@@ -8,14 +8,14 @@ class UserFactory
 {
     public static function createFromArray(array $data): User
     {
-        return new user(
+        return new User(
             id: $data['id'] ?? null,
             lastName: $data['lastName'] ?? null,
             firstName: $data['firstName'] ?? null,
             email: $data['email'] ?? null,
             password: $data['password'] ?? null,
-            isAdmin: $data['isAdmin'] ?? null,
-            isDeleted: $data['isDeleted'] ?? null
+            isAdmin: $data['isAdmin'] ?? false,
+            isDeleted: $data['isDeleted'] ?? false
         );
     }
 

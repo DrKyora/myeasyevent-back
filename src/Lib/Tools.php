@@ -66,4 +66,42 @@ class Tools
         }
     }
 
+    function logSetup($action, $message, $sql, $type)
+    {
+        $logPath = __DIR__ . '/../logs/';
+        if (!file_exists($logPath)) {
+            mkdir($logPath, 0777, true);
+        }
+        $logFile = fopen($logPath . 'setup_' . date('Y-m') . '.log', 'a');
+        if ($type == 'error') {
+            $log = "***ERROR*** [" . date('d-m-Y H:i:s') . "] " . strtoupper($action) . "\n";
+            if (is_array($message)) {
+                $log .= "SQL error : " . implode(" ", $message) . "\n";
+            } else {
+                $log .= "SQL error : " . $message . "\n";
+            }
+            $log .= "SQL : " . $sql . "\n";
+        } else {
+            $log = "[" . date('d-m-Y H:i:s') . "] " . $action . " => " . $message . " \n";
+        }
+
+        if (fputs($logFile, $log)) {
+            return true;
+        }
+    }
+
+    function logPHP($origine, $message)
+    {
+        if (LOG_ALL_PHP) {
+            $logPath = __DIR__ . '/../logs/';
+            $log = "[" . date('d-m-Y H:i:s') . "] -INFO : [" . $origine . "] >>> " . $message . "\n";
+            // $log = "_______________________________________________".date('d-m-Y H:i:s')."_______________________________________________________\n";
+            // $log .= $origine."\n";
+            // $log .= ">>> Message  : ".$message."\n";
+            // $log .= "__________________________________________________________________________________________________________________________\n";
+            $logFile = fopen($logPath . 'php_' . date('Y-m') . '.log', 'a');
+            fputs($logFile, $log);
+            fclose($logFile);
+        }
+    }
 }
