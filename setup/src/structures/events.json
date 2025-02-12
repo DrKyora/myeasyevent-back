@@ -8,14 +8,56 @@
             "default": null
         },
         {
-            "nameCol": "addressId",
-            "type": "CHAR(16)",
+            "nameCol": "title",
+            "type": "VARCHAR(255)",
             "nullable": false,
             "default": null
         },
         {
-            "nameCol": "title",
-            "type": "VARCHAR(255)",
+            "nameCol": "html",
+            "type": "LONGTEXT",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "description",
+            "type": "TEXT",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "street",
+            "type": "VARCHAR(100)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "streeNumber",
+            "type": "VARCHAR(100)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "complement",
+            "type": "VARCHAR(500)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "zipCode",
+            "type": "VARCHAR(10)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "city",
+            "type": "VARCHAR(100)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol":"country",
+            "type": "VARCHAR(100)",
             "nullable": false,
             "default": null
         },
@@ -44,12 +86,8 @@
             "default": null
         },
         {
-            "nameCol": "status",
-            "type": "ENUM",
-            "values": [
-                "Save",
-                "Posted"
-            ],
+            "nameCol": "isOnline",
+            "type": "BOOLEAN",
             "nullable": false,
             "default": null
         },
@@ -66,20 +104,8 @@
             "default": null
         },
         {
-            "nameCol": "shareLink",
-            "type": "VARCHAR(255)",
-            "nullable": false,
-            "default": null
-        },
-        {
             "nameCol": "ageRestriction",
-            "type": "ENUM",
-            "values": [
-                "Tout publique",
-                "12+",
-                "16+",
-                "18+"
-            ],
+            "type": "VARCHAR(10)",
             "nullable": false,
             "default": null
         },

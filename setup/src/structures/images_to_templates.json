@@ -2,7 +2,13 @@
     "tableName": "images_to_templates",
     "columns": [
         {
-            "nameCol": "link",
+            "nameCol": "templateId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "fileName",
             "type": "VARCHAR(50)",
             "nullable": false,
             "default": null
