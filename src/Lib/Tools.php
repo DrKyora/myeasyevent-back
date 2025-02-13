@@ -68,7 +68,7 @@ class Tools
 
     function logSetup($action, $message, $sql, $type)
     {
-        $logPath = __DIR__ . '/../logs/';
+        $logPath = __DIR__ . '/../../logs/';
         if (!file_exists($logPath)) {
             mkdir($logPath, 0777, true);
         }
@@ -93,7 +93,7 @@ class Tools
     function logPHP($origine, $message)
     {
         if (LOG_ALL_PHP) {
-            $logPath = __DIR__ . '/../logs/';
+            $logPath = __DIR__ . '/../../logs/';
             $log = "[" . date('d-m-Y H:i:s') . "] -INFO : [" . $origine . "] >>> " . $message . "\n";
             // $log = "_______________________________________________".date('d-m-Y H:i:s')."_______________________________________________________\n";
             // $log .= $origine."\n";
