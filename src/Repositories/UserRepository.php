@@ -15,13 +15,16 @@ class UserRepository
 {
     private DBConnection $db;
     private Tools $tools;
+    private UserFactory $userFactory;
 
     public function __construct(
         DBConnection $db,
-        Tools $tools
+        Tools $tools,
+        UserFactory $userFactory
     ){
         $this->db = $db;
         $this->tools = $tools;
+        $this->userFactory = $userFactory;
     }
 
     public function getUserById(string $id): User|null
@@ -35,7 +38,7 @@ class UserRepository
             if($user === false){
                 return null;
             }else{
-                return UserFactory::createFromArray(data: $user);
+                return $this->userFactory->createFromArray(data: $user);
             }
         }catch(\Exception $e){
             $idError = uniqid();
@@ -55,7 +58,7 @@ class UserRepository
             if($user === null){
                 return null;
             }else{
-                return UserFactory::createFromArray(data: $user);
+                return $this->userFactory->createFromArray(data: $user);
             }
         }catch(\Exception $e){
             $idError = uniqid();
@@ -85,7 +88,7 @@ class UserRepository
             $stmt->execute();
             $users = [];
             while ($row = $stmt->fetch(mode: PDO::FETCH_ASSOC)) {
-                $user = UserFactory::createFromArray(data: $row);
+                $user = $this->userFactory->createFromArray(data: $row);
                 $users[] = $user;
             }
             return $users;
