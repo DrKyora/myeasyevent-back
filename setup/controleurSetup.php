@@ -2,7 +2,6 @@
 
 use App\Services\DBConnection;
 
-use App\Models\User;
 use App\Factories\UserFactory;
 use App\Repositories\UserRepository;
 

@@ -94,7 +94,7 @@ class UserService
         try{
             $user = $this->userRepository->getUserById( id: $id);
             if($user){
-                $this->userRepository->deleteUser(id: $id);
+                $this->userRepository->updateUser(user: $user);
             }
             return true;
         } catch (\Exception $e) {

@@ -209,19 +209,4 @@ class UserRepository
             throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
         }
     }
-
-    public function deleteUser(string $id):bool
-    {
-        try{
-            $query = "UPDATE users SET isDeleted = 1 WHERE id = :id";
-            $stmt = $this->db->getConnection()->prepare(query: $query);
-            $stmt->bindParam(param: ':id', var: $id);
-            $stmt->execute();
-            return true;
-        } catch (\Exception $e) {
-            $idError = uniqid();
-            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre id = {$id}", errfile: $e->getFile(), errline: $e->getLine());
-            throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
-        }
-    }
 }
