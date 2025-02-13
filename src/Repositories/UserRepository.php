@@ -34,11 +34,12 @@ class UserRepository
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param:':id',var: $id);
             $stmt->execute();
-            $user = $stmt->fetch(mode: PDO::FETCH_ASSOC);
-            if($user === false){
+            $row = $stmt->fetch(mode: PDO::FETCH_ASSOC);
+            if($row === false){
                 return null;
             }else{
-                return $this->userFactory->createFromArray(data: $user);
+                $user = $this->userFactory->createFromArray(data: $row);
+                return $user;
             }
         }catch(\Exception $e){
             $idError = uniqid();
@@ -54,11 +55,12 @@ class UserRepository
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':email' , var: $email);
             $stmt->execute();
-            $user = $stmt->fetch(mode: PDO::FETCH_ASSOC);
-            if($user === null){
+            $row = $stmt->fetch(mode: PDO::FETCH_ASSOC);
+            if($row === null){
                 return null;
             }else{
-                return $this->userFactory->createFromArray(data: $user);
+                $user = $this->userFactory->createFromArray(data: $row);
+                return $user;
             }
         }catch(\Exception $e){
             $idError = uniqid();
