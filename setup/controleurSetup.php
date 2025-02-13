@@ -17,7 +17,7 @@ require_once __DIR__ . '/../src/Services/DBConnection.php';
 $userFactory = new UserFactory();
 $db = new DBConnection();
 $tools = new Tools();
-$userRepository = new UserRepository(db: $db, tools: $tools);
+$userRepository = new UserRepository(db: $db, tools: $tools, userFactory: $userFactory);
 
 class tableLog
 {
@@ -264,7 +264,7 @@ function addDefaultAdminUsers()
     $createUser = false;
     foreach ($users as $newUser) {
         if (!$userRepository->emailUserExist(emailToVerif: $newUser['email'])) {
-            $newUser = $userFactory::createFromArray(data: $newUser);
+            $newUser = $userFactory->createFromArray(data: $newUser);
             var_dump(value: $newUser);
             $response = $userRepository->addUser(user: $newUser);
             var_dump(value: $response);
