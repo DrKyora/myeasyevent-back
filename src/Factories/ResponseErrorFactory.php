@@ -6,7 +6,7 @@ use App\Responses\ResponseError;
 
 class ResponseErrorFactory
 {
-    public static function createFromArray(array $data): ResponseError
+    public function createFromArray(array $data): ResponseError
     {
         $response = new ResponseError(
             code: $data['code'] ?? null,
@@ -18,7 +18,7 @@ class ResponseErrorFactory
         return $response;
     }
 
-    public static function createFromJson(string $json): ResponseError
+    public function createFromJson(string $json): ResponseError
     {
         $data = json_decode(json: $json, associative: true);
 

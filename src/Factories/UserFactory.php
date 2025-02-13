@@ -6,7 +6,7 @@ use App\Models\User;
 
 class UserFactory
 {
-    public static function createFromArray(array $data): User
+    public function createFromArray(array $data): User
     {
         return new User(
             id: $data['id'] ?? null,
@@ -19,7 +19,7 @@ class UserFactory
         );
     }
 
-    public static function createFromJson(string $json): User
+    public function createFromJson(string $json): User
     {
         $data = json_decode(json: $json, associative: true);
         if($data === null){
