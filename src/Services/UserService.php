@@ -64,8 +64,8 @@ class UserService
     {
         try{
             $this->userValidationService->validateCreate(user: $user);
-            $this->userRepository->addUser(user: $user);
-            return $user;
+            $newUser = $this->userRepository->addUser(user: $user);
+            return $newUser;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
