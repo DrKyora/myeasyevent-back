@@ -16,11 +16,15 @@ use App\Validators\UserValidationService;
 
 class UserService
 {
+    private UserRepository $userRepository;
+    private UserValidationService $userValidationService;
+    private UserFactory $userFactory;
+    private ResponseErrorFactory $responseErrorFactory;
     public function __construct(
-        private UserRepository $userRepository,
-        private UserValidationService $userValidationService,
-        private UserFactory $userFactory,
-        private ResponseErrorFactory $responseErrorFactory,
+        UserRepository $userRepository,
+        UserValidationService $userValidationService,
+        UserFactory $userFactory,
+        ResponseErrorFactory $responseErrorFactory,
     ){
         $this->userRepository = $userRepository;
         $this->userValidationService = $userValidationService;
