@@ -1,0 +1,23 @@
+{
+    "tableName": "join_categories_to_events",
+    "columns": [
+        {
+            "nameCol": "eventId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "categoryId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isDeleted",
+            "type": "BOOLEAN",
+            "nullable":true,
+            "default": false
+        }
+    ]
+}
