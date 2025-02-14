@@ -98,6 +98,7 @@ class UserService
         try{
             $user = $this->userRepository->getUserById( id: $id);
             if($user){
+                $user->isDeleted = true;
                 $this->userRepository->updateUser(user: $user);
             }
             return true;
