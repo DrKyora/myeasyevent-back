@@ -64,7 +64,26 @@ class UserRepository
             }
         }catch(\Exception $e){
             $idError = uniqid();
-            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre id = {$email}", errfile: $e->getFile(), errline: $e->getLine());
+            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre email = {$email}", errfile: $e->getFile(), errline: $e->getLine());
+            throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
+        }
+    }
+
+    public function getAllUsers(): array|null
+    {
+        try{
+            $query = "SELECT * FROM users WHERE isDeleted = 0";
+            $stmt = $this->db->getConnection()->prepare(query: $query);
+            $stmt->execute();
+            $users = [];
+            while($row = $stmt->fetch(mode: PDO::FETCH_ASSOC)){
+                $user = $this->userFactory->createFromArray(data: $row);
+                $users[] = $user;
+            }
+            return $users;
+        } catch (\Exception $e) {
+            $idError = uniqid();
+            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__, errfile: $e->getFile(), errline: $e->getLine());
             throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
         }
     }
