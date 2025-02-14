@@ -14,14 +14,14 @@
             "default": null
         },
         {
-            "nameCol": "html",
-            "type": "LONGTEXT",
+            "nameCol": "description",
+            "type": "TEXT",
             "nullable": false,
             "default": null
         },
         {
-            "nameCol": "description",
-            "type": "TEXT",
+            "nameCol": "html",
+            "type": "LONGTEXT",
             "nullable": false,
             "default": null
         },
@@ -40,7 +40,7 @@
         {
             "nameCol": "complement",
             "type": "VARCHAR(500)",
-            "nullable": false,
+            "nullable": true,
             "default": null
         },
         {
@@ -62,13 +62,13 @@
             "default": null
         },
         {
-            "nameCol": "startedDate",
+            "nameCol": "startDate",
             "type": "DATETIME",
             "nullable": false,
             "default": null
         },
         {
-            "nameCol": "endingDate",
+            "nameCol": "endDate",
             "type": "DATETIME",
             "nullable": false,
             "default": null
@@ -86,12 +86,6 @@
             "default": null
         },
         {
-            "nameCol": "isOnline",
-            "type": "BOOLEAN",
-            "nullable": false,
-            "default": null
-        },
-        {
             "nameCol": "maxReservation",
             "type": "INT",
             "nullable": true,
@@ -106,6 +100,12 @@
         {
             "nameCol": "ageRestriction",
             "type": "VARCHAR(10)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "isOnline",
+            "type": "BOOLEAN",
             "nullable": false,
             "default": null
         },
