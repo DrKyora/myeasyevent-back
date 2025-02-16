@@ -5,6 +5,10 @@
 1000| Erreur de requête SQL
 2000|Le service demandé -action- n'existe pas
 
+SESSION|4950 - 4999
+||
+4950|L'id de l'utilisateur est manquant
+4951|La dernière action est manquante
 USER|5000 - 5079
 ||
 5000|Adresse email utilisateur ne peut être null
@@ -26,3 +30,4 @@ EVENT|5080 - 50180
 5085|Une date de fin est obligatoire
 5086|Une restriction d'age est obligatoire
 5087|Un status de publication est obligatoire
+
