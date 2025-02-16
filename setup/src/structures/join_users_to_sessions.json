@@ -1,5 +1,5 @@
 {
-    "tableName": "join_users_sessions",
+    "tableName": "join_users_to_sessions",
     "columns": [
         {
             "nameCol": "userId",
