@@ -19,6 +19,8 @@ USER|5000 - 5079
 5005|Le nom ET le prénom ne peuvent pas être vide
 5007|Cette adresse email est déjà utilisée
 5016|Cet utilisateur n'existe pas
+5017|Le mot de passe ne correspond pas
+5020|Erreur lors de la connexion avec login et mot de passe
 
 EVENT|5080 - 50180
 ||
