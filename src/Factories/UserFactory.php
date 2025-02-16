@@ -25,6 +25,6 @@ class UserFactory
         if($data === null){
             throw new \Exception(message: "Invalid JSON format");
         }
-        return self::createFromArray(data: $data);
+        return $this->createFromArray(data: $data);
     }
 }
