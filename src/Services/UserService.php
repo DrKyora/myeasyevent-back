@@ -103,25 +103,6 @@ class UserService
         }
     }
 
-    public function ConnectEmailPass(string $email,string $password): Response
-    {
-        try{
-            $user = $this->userRepository->getUserByEmail(email: $email);
-            if($user){
-                if(password_verify( password: $password, hash: $user->password)){
-                    $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $user));
-                    return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Connection réussie", 'data' => ['token' => $token]]);
-                } else {
-                    return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5017, 'message' => "Le mot de passe ne correspond pas"]);
-                }
-            } else {
-                return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5016, 'message' => "Cet utilisateur n'existe pas"]);
-            }
-        } catch (\Exception $e) {
-            return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5020, 'message' => "Erreur lors de la connexion avec login et mot de passe"]);
-        }
-    }
-
     public function DeleteUser(string $id): bool|ResponseError
     {
         try{
