@@ -112,4 +112,16 @@ class SessionService
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
+
+    public function deleteSessionDevice(string $id): bool|ResponseError
+    {
+        try{
+            if($session = $this->sessionRepository->getSessionByDeviceId(deviceId: $id)){
+                $this->sessionRepository->deleteSessionDevice(deviceId: $session->id);
+            }
+            return true;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
 }

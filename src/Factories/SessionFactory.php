@@ -11,6 +11,7 @@ class SessionFactory
         return new Session(
             id: $data['id'] ?? null,
             userId: $data['userId'] ?? null,
+            deviceId: $data['deviceId'] ?? null,
             lastAction: $data['lastAction'] ?? null,
             isDeleted: $data['isDeleted'] ?? false
         );

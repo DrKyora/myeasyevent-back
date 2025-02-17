@@ -63,10 +63,10 @@ class AuthorizedDeviceService
         $this->emailService= $emailService;
     }
 
-    public function getAuthorizedDeviceById(string $id): AuthorizedDevice|ResponseError|null
+    public function getAuthorizedDeviceById(string $deviceId): AuthorizedDevice|ResponseError|null
     {
         try{
-            $device = $this->authorizedDeviceRepository->getAuthorizedDeviceById(deviceId: $id);
+            $device = $this->authorizedDeviceRepository->getAuthorizedDeviceById(deviceId: $deviceId);
             return $device;
         }catch(\Exception $e){
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
@@ -140,7 +140,7 @@ class AuthorizedDeviceService
         }
     }
 
-    public function confirmAuthorizedDevice(string $authorizedDeviceId)
+    public function confirmAuthorizedDevice(string $authorizedDeviceId): bool|ResponseError
     {
         try{
             if($authorizedDevice = $this->authorizedDeviceExist(authorizedDeviceId: $authorizedDeviceId)){
@@ -172,8 +172,30 @@ class AuthorizedDeviceService
             $user = $this->userRepository->getUserByEmail(email: $email);
             if($user){
                 if(password_verify( password: $password, hash: $user->password)){
-                    $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $user));
-                    return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Connection réussie", 'data' => ['token' => $token]]);
+                    $device = $this->registerNewAuthorizedDevice(userId: $user->id);
+                    $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $device));
+                    $this->emailService->sendMail(
+                        addressFrom :[
+                            'address' => $_ENV['MAIL_DEFAULT_FROM_ADDRESSE'],
+                            'name' => $_ENV['MAIL_DEFAULT_FROM_NAME'],
+                        ],
+                        addressA: [
+                            [
+                                'address' => $user->email,
+                                'name' => $user->lastName . ' ' . $user->firstName
+                            ]
+                        ],
+                        addressCc: null,
+                        addressCci: null,
+                        subject: 'My easy event connexion',
+                        contentsEmails:[
+                            '{{UserName}}' => $user->lastName . ' ' . $user->firstName,
+                            '{{DeviceID}}' => $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: $device->id),
+                            '{{URLConfirm}}' => $_ENV['CONFIRM_DEVICES_PATH']
+                        ],
+                        urlTemplate: __DIR__ . '/../../templates/emails/validateDevice.html'
+                    );
+                    return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Device enregistré", 'data' => ['token' => $token]]);
                 } else {
                     return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5017, 'message' => "Le mot de passe ne correspond pas"]);
                 }
@@ -182,6 +204,33 @@ class AuthorizedDeviceService
             }
         } catch (\Exception $e) {
             return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5020, 'message' => "Erreur lors de la connexion avec login et mot de passe"]);
+        }
+    }
+
+    public function refreshAuthorizedDevice(string $authorizedDeviceId): bool|ResponseError
+    {
+        try{
+            $authorizedDevice = $this->authorizedDeviceRepository->getAuthorizedDeviceById(deviceId: $authorizedDeviceId);
+            $now = new \DateTime();
+            $authorizedDevice->lastUsed = $now->format(format: 'Y-m-d H:i:s.u');
+            $this->authorizedDeviceRepository->updateAuthorizedDevice(authorizedDevice: $authorizedDevice);
+            return true;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function deleteAuthorizedDevice(string $id): bool|ResponseError
+    {
+        try{
+            $device = $this->authorizedDeviceRepository->getAuthorizedDeviceById(deviceId: $id);
+            if($device){
+                $device->isDeleted = true;
+                $this->authorizedDeviceRepository->updateAuthorizedDevice(authorizedDevice: $device);
+            }
+            return true;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 }

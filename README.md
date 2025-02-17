@@ -10,6 +10,8 @@ SESSION|4950 - 4999
 ||
 4950|L'id de l'utilisateur est manquant
 4951|La dernière action est manquante
+4953|Erreur lors de la création de la session
+
 USER|5000 - 5079
 ||
 5000|Adresse email utilisateur ne peut être null
@@ -19,9 +21,12 @@ USER|5000 - 5079
 5004|Pas de caractère spéciaux dans le mot de passe
 5005|Le nom ET le prénom ne peuvent pas être vide
 5007|Cette adresse email est déjà utilisée
-5016|Cet utilisateur n'existe pas
+5009|Ce token de device n'est pas valide! -> Utiliser login/pass et enregistrer + confirmer le device à nouveau
+5011|Ce device n'est pas valide
+5015|Ce device n'a pas encore été enregistré
 5017|Le mot de passe ne correspond pas
 5020|Erreur lors de la connexion avec login et mot de passe
+5021|Erreur lors de la vérification du device
 
 EVENT|5080 - 5099
 ||

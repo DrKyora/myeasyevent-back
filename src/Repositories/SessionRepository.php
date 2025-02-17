@@ -67,13 +67,34 @@ class SessionRepository
         }
     }
 
+    public function getSessionByDeviceId(string $deviceId): Session|null
+    {
+        try{
+            $query = "SELECT * FROM users_sessions WHERE deviceId = :id AND isDeleted = 0";
+            $stmt = $this->db->getConnection()->prepare(query: $query);
+            $stmt->bindParam(param: ":id", var: $deviceId);
+            $stmt->execute();
+            $row = $stmt->fetch(mode: PDO::FETCH_ASSOC);
+            if(!$row){
+                return null;
+            }
+            $session = $this->sessionFactory->createFromArray(data: $row);
+            return $session;
+        } catch (\Exception $e) {
+            $idError = uniqid();
+            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre deviceId = {$deviceId}", errfile: $e->getFile(), errline: $e->getLine());
+            throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
+        }
+    }
+
     public function addSession(Session $session): Session
     {
         try{
-            $query = "INSERT INTO sessions (id,userId,lastAction,isDeleted) VALUES(:id,:userId,:lastAction,:isDeleted)";
+            $query = "INSERT INTO sessions (id,userId,deviceId,lastAction,isDeleted) VALUES(:id,:userId,:deviceId,:lastAction,:isDeleted)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ":id", var: $session->id);
             $stmt->bindParam(param: ":userId", var: $session->userId);
+            $stmt->bindParam(param: ":deviceId", var: $session->deviceId);
             $stmt->bindParam(param: ":lastAction", var: $session->lastAction);
             $stmt->bindParam(param: ":isDeleted", var: $session->isDeleted);
             $stmt->execute();
@@ -93,6 +114,10 @@ class SessionRepository
             if($session->userId !== null){
                 $columnsToUpdate[] = "userId = :userId";
                 $parameters[':userId'] = $session->userId;
+            }
+            if($session->deviceId !== null){
+                $columnsToUpdate[] = "deviceId = :deviceId";
+                $parameters[':deviceId'] = $session->deviceId;
             }
             if($session->lastAction !== null){
                 $columnsToUpdate[] = "lastAction = :lastAction";
@@ -123,6 +148,21 @@ class SessionRepository
         } catch (\Exception $e) {
             $idError = uniqid();
             $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre parameter = {$parameter}", errfile: $e->getFile(), errline: $e->getLine());
+            throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
+        }
+    }
+
+    public function DeleteSessionDevice(string $deviceId): bool
+    {
+        try{
+            $query = "DELETE * FROM users_sessions WHERE deviceId = :id AND isDeleted = 0";
+            $stmt = $this->db->getConnection()->prepare(query: $query);
+            $stmt->bindParam(param: ":id", var: $deviceId);
+            $stmt->execute();
+            return true;
+        } catch (\Exception $e) {
+            $idError = uniqid();
+            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre deviceId = {$deviceId}", errfile: $e->getFile(), errline: $e->getLine());
             throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
         }
     }

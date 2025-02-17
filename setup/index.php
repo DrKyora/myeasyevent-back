@@ -132,7 +132,6 @@
     </div>';
     }
     require_once("./controleurSetup.php");
-    require_once("../php/config.php");
     // Récupérer tous les fichiers JSON du répertoire
     $srcPath = "./src/structures/";
     $jsonFiles = glob($srcPath . '*.json');

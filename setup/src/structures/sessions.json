@@ -8,6 +8,12 @@
             "default": null
         },
         {
+            "nameCol": "deviceId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
             "nameCol": "lastAction",
             "type": "DATETIME",
             "nullable": false,

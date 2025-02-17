@@ -1,0 +1,47 @@
+{
+    "tableName": "authorized_devices",
+    "columns": [
+      {
+        "nameCol": "name",
+        "type": "VARCHAR(100)",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "nameCol": "type",
+        "type": "VARCHAR(100)",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "nameCol": "model",
+        "type": "VARCHAR(100)",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "nameCol": "userId",
+        "type": "VARCHAR(16)",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "nameCol": "validateDate",
+        "type": "DATETIME",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "nameCol": "lastUsed",
+        "type": "DATETIME",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "nameCol": "isDeleted",
+        "type": "BOOLEAN",
+        "nullable": false,
+        "default": false
+      }
+    ]
+  }
