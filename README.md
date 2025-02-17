@@ -3,6 +3,7 @@
 | Code |        Messag         |
 | :--: | :-------------------: |
 1000| Erreur de requête SQL
+1100| Erreur Sendgrid
 2000|Le service demandé -action- n'existe pas
 
 SESSION|4950 - 4999
@@ -22,7 +23,7 @@ USER|5000 - 5079
 5017|Le mot de passe ne correspond pas
 5020|Erreur lors de la connexion avec login et mot de passe
 
-EVENT|5080 - 50180
+EVENT|5080 - 5099
 ||
 5080|Un user id est obligatoire
 5081|Un titre est obligatoire
@@ -33,3 +34,18 @@ EVENT|5080 - 50180
 5086|Une restriction d'age est obligatoire
 5087|Un status de publication est obligatoire
 
+AUTHORIZEDDEVICE|5100 - 5199
+||
+5100|Veuillez renseigner l'ID de l'utilisateur
+5101|Veuillez renseigner la date de derniere utilisation
+5102|Veuillez renseigner l'ID de l'appareil autorisé
+
+EMAIL|5200 - 5299
+||
+5200|Une seul adresse email d'expédition est requise
+5201|Une adresse email d'expédition est requise
+5202|Une adresse email de destination est requise
+5203|Un sujet est requis
+5204|Un message est requis
+5205|Adresse email invalide
+5206|Un nom de destinataire est requis
