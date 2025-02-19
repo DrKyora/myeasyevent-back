@@ -8,16 +8,16 @@ class Email
     public ?array $addressA;
     public ?array $addressCc;
     public ?array $addressCci;
-    public ?array $subject;
-    public ?array $content;
+    public ?string $subject;
+    public ?string $content;
 
     public function __construct(
         array $addressFrom = null,
         array $addressA = null,
         array $addressCc = null,
         array $addressCci = null,
-        array $subject = null,
-        array $content = null
+        string $subject = null,
+        string $content = null
     ){
         $this->addressFrom = $addressFrom;
         $this->addressA = $addressA;

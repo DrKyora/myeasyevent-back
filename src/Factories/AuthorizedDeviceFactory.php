@@ -9,14 +9,14 @@ class AuthorizedDeviceFactory
     public function createFromArray(array $array): AuthorizedDevice
     {
         return new AuthorizedDevice(
-            id: $data['id'] ?? null,
-            name: $data['name'] ?? null,
-            type: $data['type'] ?? null,
-            model: $data['model'] ?? null,
-            userId: $data['userId'] ?? null,
-            validateDate: $data['validateDate'] ?? null,
-            lastUsed: $data['lastUsed'] ?? null,
-            isDeleted: $data['isDeleted'] ?? false
+            id: $array['id'] ?? null,
+            name: $array['name'] ?? null,
+            type: $array['type'] ?? null,
+            model: $array['model'] ?? null,
+            userId: $array['userId'] ?? null,
+            validateDate: $array['validateDate'] ?? null,
+            lastUsed: $array['lastUsed'] ?? null,
+            isDeleted: $array['isDeleted'] ?? false
         );
     }
 

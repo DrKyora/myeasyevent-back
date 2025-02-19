@@ -90,22 +90,22 @@ $userService = new UserService(
     responseFactory: $responseFactory,
     responseErrorFactory: $responseErrorFactory
 );
+$emailService = new EmailService(
+    tools: $tools,
+    emailFactory: $emailFactory,
+    responseErrorFactory: $responseErrorFactory,
+    emailValidationService: $emailValidationService
+);
 $authorizedDeviceService = new AuthorizedDeviceService(
     tools: $tools,
     authorizedDeviceFactory: $authorizedDeviceFactory,
     responseErrorFactory: $responseErrorFactory,
     responseFactory: $responseFactory,
     authorizedDeviceRepository: $authorizedDeviceRepository,
-    userRepository: $UserRepository,
+    userRepository: $userRepository,
     authorizedDeviceValidationService: $authorizedDeviceValidationService,
     userValidationService: $userValidationService,
     emailService: $emailService
-);
-$emailService = new EmailService(
-    tools: $tools,
-    emailFactory: $emailFactory,
-    responseErrorFactory: $responseErrorFactory,
-    emailValidationService: $emailValidationService
 );
 
 switch($request->action) {
@@ -127,7 +127,7 @@ switch($request->action) {
                 if($authorizedDeviceService->authorizedDeviceExist(authorizedDeviceId: $device->id)){
                     if($authorizedDeviceService->authorizedDeviceIsValidate(authorizedDevice: $device)){
                         $sessionService->deleteSessionDevice(id: $device->id);
-                        $lastAction = (new \DateTime()->format(format: 'Y-m-d H:i:s'));
+                        $lastAction = (new \DateTime())->format(format: 'Y-m-d H:i:s');
                         $session = $sessionService->createSession(userId: $device->userId, lastAction: $lastAction);
                         if($session instanceof Session){
                             $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $device->id);

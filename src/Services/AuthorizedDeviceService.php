@@ -2,7 +2,7 @@
 
 namespace App\Services;
 // Require
-require __DIR__ . '/../config.php';
+require_once __DIR__ . '\..\..\config.php';
 // Library
 use App\Lib\Tools;
 
@@ -96,7 +96,7 @@ class AuthorizedDeviceService
                     break;
                 default:
                     $defaultName = '';
-                    $os = '';
+                    $os = 'Autres';
             }
             preg_match(pattern: '/mobile/i', subject: $user_agent) ? $type = 'mobile' : $type = 'computer';
             $now = new \DateTime();
@@ -105,7 +105,7 @@ class AuthorizedDeviceService
                 'type' => $type,
                 'model' => $os,
                 'userId' => $userId,
-                'lastUsed' => $now->format(format: 'Y-m-q H:i:s.u')
+                'lastUsed' => $now->format(format: 'Y-m-d H:i:s.u')
             ]);
             $this->authorizedDeviceValidationService->validate(authorizedDevice: $authorizedDevice);
             $authorizedDevice = $this->authorizedDeviceRepository->addAuthorizedDevice(authorizedDevice: $authorizedDevice);
@@ -174,7 +174,7 @@ class AuthorizedDeviceService
                 if(password_verify( password: $password, hash: $user->password)){
                     $device = $this->registerNewAuthorizedDevice(userId: $user->id);
                     $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $device));
-                    $this->emailService->sendMail(
+                    $mail = $this->emailService->sendMail(
                         addressFrom :[
                             'address' => $_ENV['MAIL_DEFAULT_FROM_ADDRESSE'],
                             'name' => $_ENV['MAIL_DEFAULT_FROM_NAME'],
@@ -195,6 +195,7 @@ class AuthorizedDeviceService
                         ],
                         urlTemplate: __DIR__ . '/../../templates/emails/validateDevice.html'
                     );
+                    $this->tools->logDebug(message: json_encode(value: $mail));
                     return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Device enregistré", 'data' => ['token' => $token]]);
                 } else {
                     return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5017, 'message' => "Le mot de passe ne correspond pas"]);

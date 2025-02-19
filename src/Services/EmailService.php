@@ -37,7 +37,7 @@ class EmailService
         $this->emailValidationService = $emailValidationService;
     }
 
-    public function sendMail(array $addressFrom, array $addressA, ?array $addressCc, ?array $addressCci, string $subject, array $contentsEmails, string $urlTemplate)
+    public function sendMail(array $addressFrom, array $addressA, ?array $addressCc, ?array $addressCci, string $subject, array $contentsEmails, string $urlTemplate): bool|ResponseError
     {
         try{
             $email = $this->emailFactory->createEmpty();
@@ -87,7 +87,7 @@ class EmailService
             if($response->statusCode() <= 202){
                 return true;
             }else{
-                $message = 'Error ' . $response->statusCode() . ' - header : ' . json_encode($response->headers()) . ' - body : ' . $response->body();
+                $message = 'Error ' . $response->statusCode() . ' - header : ' . json_encode(value: $response->headers()) . ' - body : ' . $response->body();
                 return $this->responseErrorFactory->createFromArray(data: ['code' => 1100, 'message' => $message]);
             }
         }catch(\Exception $e){

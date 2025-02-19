@@ -67,11 +67,11 @@ class AuthorizedDeviceRepository
         }
     }
 
-    public function addAuthorizedDevice(AuthorizedDevice $authorizedDevice)
+    public function addAuthorizedDevice(AuthorizedDevice $authorizedDevice): AuthorizedDevice|null
     {
         try{
             $authorizedDevice->id = uniqid();
-            $query = "INSERT INTO authorized_devices (id,name,type,model,userId,validateDate,lastUsed) VALUES (:id,:name,:type,:mode,:userId,:validateDate,:lastUser)";
+            $query = "INSERT INTO authorized_devices (id,name,type,model,userId,validateDate,lastUsed) VALUES (:id,:name,:type,:model,:userId,:validateDate,:lastUsed)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id',var: $authorizedDevice->id);
             $stmt->bindParam(param: ':name',var: $authorizedDevice->name);
