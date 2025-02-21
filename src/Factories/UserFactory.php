@@ -14,6 +14,7 @@ class UserFactory
             firstName: $data['firstName'] ?? null,
             email: $data['email'] ?? null,
             password: $data['password'] ?? null,
+            validateDate: $data['validateDate'] ?? null,
             isAdmin: $data['isAdmin'] ?? false,
             isDeleted: $data['isDeleted'] ?? false
         );

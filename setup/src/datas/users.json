@@ -1,6 +1,7 @@
 {
     "users":[
         {
+            "lastName": "Delgutte",
             "firstName": "Remi",
             "email": "delgutte.remi@gmail.com",
             "password": "ABCinfo123*",

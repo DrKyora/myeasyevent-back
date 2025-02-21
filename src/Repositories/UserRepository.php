@@ -175,13 +175,14 @@ class UserRepository
         try{
             $user->id = uniqid();
             $user->password = password_hash(password: $user->password, algo: PASSWORD_DEFAULT, options: ['cost'=>10]);
-            $query = "INSERT INTO users(id,lastName,firstName,email,password,isAdmin)VALUES(:id,:lastName,:firstName,:email,:password,:isAdmin)";
+            $query = "INSERT INTO users(id,lastName,firstName,email,password,validateDate,isAdmin)VALUES(:id,:lastName,:firstName,:email,:password,:validateDate,:isAdmin)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id',var: $user->id);
             $stmt->bindParam(param: ':lastName',var: $user->lastName);
             $stmt->bindParam(param: ':firstName',var: $user->firstName);
             $stmt->bindParam(param: ':email',var: $user->email);
             $stmt->bindParam(param: ':password',var: $user->password);
+            $stmt->bindParam(param: ':validateDate', var: $user->validateDate);
             $stmt->bindParam(param: ':isAdmin',var: $user->isAdmin);
             $stmt->execute();
             return $user;
@@ -213,6 +214,10 @@ class UserRepository
                 $user->password = password_hash(password: $user->password, algo: PASSWORD_DEFAULT, options: ['cost' => 10]);
                 $columnsToUpdate[] = "password = :password";
                 $parameters[":password"] = $user->password;
+            }
+            if($user->validateDate !== null){
+                $columnsToUpdate[] = "validateDate = :validateDate";
+                $parameters[":validateDate"] = $user->validateDate;
             }
             if ($user->isAdmin !== null) {
                 $columnsToUpdate[] = "isAdmin = :isAdmin";

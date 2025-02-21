@@ -4,37 +4,43 @@
         {
             "nameCol": "lastName",
             "type": "VARCHAR(100)",
-            "nullable": true,
+            "nullable": false,
             "default": null
         },
         {
             "nameCol": "firstName",
             "type": "VARCHAR(100)",
-            "nullable": true,
+            "nullable": false,
             "default": null
         },
         {
             "nameCol": "email",
             "type": "VARCHAR(255)",
-            "nullable": true,
+            "nullable": false,
             "default": null
         },
         {
             "nameCol": "password",
             "type": "VARCHAR(500)",
+            "nullable": false,
+            "default": null
+        },
+        {
+            "nameCol": "ValidateDate",
+            "type": "DATETIME",
             "nullable": true,
             "default": null
         },
         {
             "nameCol": "isAdmin",
             "type": "BOOLEAN",
-            "nullable": true,
+            "nullable": false,
             "default": false
         },
         {
             "nameCol": "isDeleted",
             "type": "BOOLEAN",
-            "nullable": true,
+            "nullable": false,
             "default": false
         }
     ]

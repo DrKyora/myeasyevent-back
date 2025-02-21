@@ -265,7 +265,8 @@ function addDefaultAdminUsers()
     foreach ($users as $newUser) {
         if (!$userRepository->emailUserExist(emailToVerif: $newUser['email'])) {
             $newUser = $userFactory->createFromArray(data: $newUser);
-            var_dump(value: $newUser);
+            $now = new \DateTime();
+            $newUser->validateDate = $now->format(format: 'Y-m-d H:i:s.u');
             $response = $userRepository->addUser(user: $newUser);
             var_dump(value: $response);
             if ($response) {

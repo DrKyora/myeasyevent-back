@@ -1,4 +1,6 @@
 <?php
+
+use App\Responses\ResponseError;
 ini_set(option: 'display_errors', value: 1);
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -86,7 +88,8 @@ $userService = new UserService(
     userValidationService: $userValidationService,
     userFactory: $userFactory,
     responseFactory: $responseFactory,
-    responseErrorFactory: $responseErrorFactory
+    responseErrorFactory: $responseErrorFactory,
+    emailService: $emailService
 );
 $emailService = new EmailService(
     tools: $tools,
@@ -165,6 +168,14 @@ switch($request->action) {
             } else {
                 $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Ce token de device n'est pas valide! -> Utiliser login/pass et enregistrer + confirmer le device à nouveau"]);
             }
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    case'subscription':
+        try{
+            $newUser = $userFactory->createFromJson(json: $request->user);
+            
         } catch (\Throwable $th) {
             $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
         }

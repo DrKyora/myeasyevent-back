@@ -17,6 +17,7 @@ use App\Responses\Response;
 
 use App\Validators\UserValidationService;
 
+use App\Services\EmailService;
 
 class UserService
 {
@@ -26,6 +27,7 @@ class UserService
     private UserFactory $userFactory;
     private ResponseErrorFactory $responseErrorFactory;
     private ResponseFactory $responseFactory;
+    private EmailService $emailService;
     public function __construct(
         Tools $tools,
         UserRepository $userRepository,
@@ -33,6 +35,7 @@ class UserService
         UserFactory $userFactory,
         ResponseFactory $responseFactory,
         ResponseErrorFactory $responseErrorFactory,
+        EmailService $emailService
     ){
         $this->tools = $tools;
         $this->userRepository = $userRepository;
@@ -40,6 +43,7 @@ class UserService
         $this->userFactory = $userFactory;
         $this->responseFactory = $responseFactory;
         $this->responseErrorFactory = $responseErrorFactory;
+        $this->emailService = $emailService;
     }
 
     public function getUser(string $key, string $value): User|ResponseError
@@ -69,13 +73,79 @@ class UserService
         }
     }
 
-    public function createUser(User $user): user|ResponseError
+    public function subscription(User $newUser)
     {
         try{
-            $this->userValidationService->validateCreate(user: $user);
-            $newUser = $this->userRepository->addUser(user: $user);
-            return $newUser;
+            if($this->userValidationService->validateCreate(user: $newUser)){
+                $user = $this->userRepository->addUser(user: $newUser);
+                $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: $user);
+                $this->emailService->sendMail(
+                    addressFrom :[
+                        'address' => $_ENV['MAIL_DEFAULT_FROM_ADDRESSE'],
+                        'name' => $_ENV['MAIL_DEFAULT_FROM_NAME'],
+                    ],
+                    addressA: [
+                        [
+                            'address' => $user->email,
+                            'name' => $user->lastName . ' ' . $user->firstName
+                        ]
+                    ],
+                    addressCc: null,
+                    addressCci: null,
+                    subject: 'My easy event inscription',
+                    contentsEmails:[
+                        '{{UserName}}' => $user->lastName . ' ' . $user->firstName,
+                        '{{DeviceID}}' => $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: $user->id),
+                        '{{URLConfirm}}' => $_ENV['CONFIRM_SUBSCRIPTION_PATH']
+                    ],
+                    urlTemplate: __DIR__ . '/../../templates/emails/validateDevice.html'
+                );
+                return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Utilisateur enregistré", 'data' => ['token' => $token]]);
+            }
         } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function userIsValide(User $user): bool|ResponseError
+    {
+        try{
+            if($user->validateDate){
+                return true;
+            }else{
+                return false;
+            }
+        }catch(\Exception $e){
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function confirmSubscriptionUser(string $userId): bool|ResponseError
+    {
+        try{
+            if($user = $this->userExist(userId: $userId)){
+                if(!$this->userIsValide(user: $user)){
+                    $now = new \DateTime();
+                    $user->validateDate = $now->format(format: 'Y-m-d H:i:s.u');
+                    $this->userRepository->updateUser(user: $user);
+                }
+                return true;
+            }else{
+                return false;
+            }
+        }catch(\Exception $e){
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function userExist(string $userId = null): User|ResponseError|null
+    {
+        try{
+            if($user = $this->userRepository->getUserById(id: $userId)){
+                return $user;
+            }
+            return null;
+        }catch(\Exception $e){
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }

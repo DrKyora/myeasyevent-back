@@ -9,6 +9,7 @@ class User
     public ?string $firstName;
     public ?string $email;
     public ?string $password;
+    public ?string $validateDate;
     public ?bool $isAdmin;
     public ?bool $isDeleted;
 
@@ -18,6 +19,7 @@ class User
         ?string $firstName,
         ?string $email,
         ?string $password,
+        ?string $validateDate,
         ?bool $isAdmin = false,
         ?bool $isDeleted = false
     ){
@@ -26,6 +28,7 @@ class User
         $this->firstName = $firstName;
         $this->email = $email;
         $this->password = $password;
+        $this->validateDate = $validateDate;
         $this->isAdmin = $isAdmin;
         $this->isDeleted = $isDeleted;
     }
