@@ -78,19 +78,19 @@ class AuthorizedDeviceService
         try{
             $user_agent = $_SERVER['HTTP_USER_AGENT'];
             switch(true){
-                case(preg_match(pattern: '/Windows/i', subject: $user_agent)):
+                case (preg_match(pattern: '/Windows/i', subject: $user_agent)):
                     $defaultName = 'Ordinateur';
                     $os = 'Windowws';
                     break;
-                case(preg_match(pattern: '/Android/i', subject: $user_agent)):
+                case (preg_match(pattern: '/Android/i', subject: $user_agent)):
                     $defaultName = 'Smartphone-tablette';
                     $os = 'Android';
                     break;
-                case(preg_match(pattern: '/(iPhone|iPad|iPod)/i', subject: $user_agent));
+                case (preg_match(pattern: '/(iPhone|iPad|iPod)/i', subject: $user_agent));
                     $defaultName = 'Smartphone-tablette';
                     $os = 'iOS';
                     break;
-                case(preg_match(pattern: '/Macintosh|Mac OS X/i', subject: $user_agent)):
+                case (preg_match(pattern: '/Macintosh|Mac OS X/i', subject: $user_agent)):
                     $defaultName = 'Ordinateur';
                     $os = 'macOS';
                     break;
@@ -195,7 +195,6 @@ class AuthorizedDeviceService
                         ],
                         urlTemplate: __DIR__ . '/../../templates/emails/validateDevice.html'
                     );
-                    $this->tools->logDebug(message: json_encode(value: $mail));
                     return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Device enregistré", 'data' => ['token' => $token]]);
                 } else {
                     return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5017, 'message' => "Le mot de passe ne correspond pas"]);

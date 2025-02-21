@@ -23,7 +23,6 @@ class AuthorizedDeviceValidationService
 
     public function validate(AuthorizedDevice $authorizedDevice): bool
     {
-        $this->tools->logDebug(message: json_encode(value: $authorizedDevice));
         if(empty($authorizedDevice->userId)){
             throw new \Exception(message:"Veuillez renseigner l'ID de l'utilisateur",code: 5100 );
         }

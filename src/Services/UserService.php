@@ -53,7 +53,6 @@ class UserService
                     $user = $this->userRepository->getUserByEmail(email: $value);
                     break;
             }
-            $this->userValidationService->validateCreate(user: $user);
             return $user;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);

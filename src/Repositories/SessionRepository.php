@@ -70,7 +70,7 @@ class SessionRepository
     public function getSessionByDeviceId(string $deviceId): Session|null
     {
         try{
-            $query = "SELECT * FROM users_sessions WHERE deviceId = :id AND isDeleted = 0";
+            $query = "SELECT * FROM sessions WHERE deviceId = :id AND isDeleted = 0";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ":id", var: $deviceId);
             $stmt->execute();

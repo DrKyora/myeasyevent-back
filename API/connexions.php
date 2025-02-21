@@ -1,6 +1,4 @@
 <?php
-
-use App\Models\Session;
 ini_set(option: 'display_errors', value: 1);
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -124,12 +122,13 @@ switch($request->action) {
         try{
             $string = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->token);
             if($device = $authorizedDeviceFactory->createFromString(string: $string)){
+                $tools->logDebug(message: json_encode(value: $device));
                 if($authorizedDeviceService->authorizedDeviceExist(authorizedDeviceId: $device->id)){
                     if($authorizedDeviceService->authorizedDeviceIsValidate(authorizedDevice: $device)){
                         $sessionService->deleteSessionDevice(id: $device->id);
                         $lastAction = (new \DateTime())->format(format: 'Y-m-d H:i:s');
-                        $session = $sessionService->createSession(userId: $device->userId, lastAction: $lastAction);
-                        if($session instanceof Session){
+                        $session = $sessionService->createSession(userId: $device->userId, deviceId: $device->id, lastAction: $lastAction);
+                        if($session instanceof App\Models\Session){
                             $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $device->id);
                             $tokenSession = $tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $session));
                             $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Token correct", 'data' => ['session' => $tokenSession]]);
@@ -160,8 +159,9 @@ switch($request->action) {
                     $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $device->id);
                     $user = $userService->getUser(key: 'id', value: $session->userId);
                     $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Session valide", 'data' => ['user' => $user]]);
+                } else {
+                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Ce token de device n'est pas valide! -> Utiliser login/pass et enregistrer + confirmer le device à nouveau"]);
                 }
-                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Session Valide", 'data' => ['user' => $user]]);
             } else {
                 $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Ce token de device n'est pas valide! -> Utiliser login/pass et enregistrer + confirmer le device à nouveau"]);
             }

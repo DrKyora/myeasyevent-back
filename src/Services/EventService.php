@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Factories\EventFactory;
 use App\Models\Event;
+use App\DTOModels\DTOEventUser;
 
 use App\Factories\UserFactory;
 use App\Factories\ResponseErrorFactory;
 
 use App\Repositories\EventRepository;
+use App\Repositories\UserRepository;
 
 use App\Responses\ResponseError;
 
@@ -17,6 +19,7 @@ use App\Validators\EventValidationService;
 class EventService
 {
     private EventRepository $eventRepository;
+    private UserRepository $userRepository;
     private EventValidationService $eventValidationService;
     private EventFactory $eventFactory;
     private ResponseErrorFactory $responseErrorFactory;
@@ -32,21 +35,26 @@ class EventService
         $this->responseErrorFactory = $responseErrorFactory;
     }
 
-    public function getEvent(string $key,string $value): Event|ResponseError
+    public function getEventById(string $id): Event|ResponseError
     {
         try{
-            switch($key){
-                case'id':
-                    $event = $this->eventRepository->getEventById(id: $value);
-                    break;
-                case 'userId':
-                    $event = $this->eventRepository->getEventByUserId( userId: $value);
-                    break;
-                default:
-                    return $this->responseErrorFactory->createFromArray(data: ['code' => 2000, 'message' => "Le service demandé: " . $key . " n'existe pas"]);
-            }
-            $this->eventValidationService->validate(event: $event);
+            $event = $this->eventRepository->getEventById(id: $id);
             return $event;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function getEventsWithUser(string $userId): array|ResponseError
+    {
+        try{
+            $arrayDTOEventUser = [];
+            $events = $this->eventRepository->getEventByUserId(userId: $userId);
+            foreach($events as $event){
+                $user = $this->userRepository->getUserById(id: $userId);
+                $arrayDTOEventUser[] = new DTOEventUser(user: $user, event: $event);
+            }
+            return $arrayDTOEventUser;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }

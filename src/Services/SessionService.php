@@ -96,13 +96,14 @@ class SessionService
         }
     }
 
-    public function createSession(string $userId, string $lastAction): Session|ResponseError
+    public function createSession(string $userId, string $lastAction, string $deviceId): Session|ResponseError
     {
         try{
             $sessionId = uniqid();
             $session = $this->sessionFactory->createFromArray(data: [
                 'id' => $sessionId,
                 'userId' => $userId,
+                'deviceId' => $deviceId,
                 'lastAction' => $lastAction
             ]);
             $this->sessionValidationService->validate(session: $session);

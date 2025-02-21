@@ -30,7 +30,7 @@ class UserRepository
     public function getUserById(string $id): User|null
     {
         try{
-            $query = "SELECT * FROM users WHERE id = :id AND isDelete = 0";
+            $query = "SELECT * FROM users WHERE id = :id AND isDeleted = 0";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param:':id',var: $id);
             $stmt->execute();
