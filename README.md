@@ -5,6 +5,7 @@
 1000| Erreur de requête SQL
 1100| Erreur Sendgrid
 2000| Le service demandé -action- n'existe pas
+||
 session| 4950 - 4999
 ||
 4950| L'id de l'utilisateur est manquant
