@@ -115,4 +115,12 @@ class Tools
         }
         return $randomString;
     }
+
+    function calculAge($dateNaissance) 
+    {
+        $dateNaissance = new \DateTime(datetime: $dateNaissance);
+        $aujourdHui = new \DateTime();
+        $age = $dateNaissance->diff(targetObject: $aujourdHui)->y;
+        return $age;
+    }
 }

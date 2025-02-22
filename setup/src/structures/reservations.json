@@ -2,21 +2,27 @@
     "tableName": "reservations",
     "columns":[
         {
+            "nameCol": "eventId",
+            "type": "VARCHAR(16)",
+            "nullable": false,
+            "default": null
+        },
+        {
             "nameCol": "lastName",
             "type": "VARCHAR(100)",
-            "nullable": true,
+            "nullable": false,
             "default": null
         },
         {
             "nameCol": "firstName",
             "type": "VARCHAR(100)",
-            "nullable": true,
+            "nullable": false,
             "default": null
         },
         {
             "nameCol": "email",
             "type": "VARCHAR(255)",
-            "nullable": true,
+            "nullable": false,
             "default": null
         },
         {
@@ -26,9 +32,9 @@
             "default": null
         },
         {
-            "nameCol": "dataReservation",
+            "nameCol": "dateReservation",
             "type": "DATETIME",
-            "nullable": false,
+            "nullable": true,
             "default": null
         },
         {

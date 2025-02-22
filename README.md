@@ -58,3 +58,27 @@ EMAIL|5200 - 5299
 5204|Un message est requis
 5205|Adresse email invalide
 5206|Un nom de destinataire est requis
+RESERVATION|5300 - 5399
+||
+5300|Veuillez renseigner le prénom et le prénom
+5301|Veuillez renseigner l'email
+5302|Veuillez renseigner un email valide
+5303|Une reservation avec cet email existe deja
+5304|Veuillez renseigner votre age
+5305|Vous n'avez pas l'age requis pour cet évement
+
+/**
+ * Libraries
+ */
+/**
+ * Factories
+ */
+/**
+ * Repositories
+ */
+/**
+ * Validators
+ */
+/**
+ * Services
+ */
