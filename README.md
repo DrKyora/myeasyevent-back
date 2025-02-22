@@ -5,12 +5,12 @@
 1000| Erreur de requête SQL
 1100| Erreur Sendgrid
 2000| Le service demandé -action- n'existe pas
-SESSION| 4950 - 4999
+session| 4950 - 4999
 ||
 4950| L'id de l'utilisateur est manquant
 4951| La dernière action est manquante
 4953| Erreur lors de la création de la session
-USER| 5000 - 5079
+user| 5000 - 5079
 ||
 5000| Adresse email utilisateur ne peut être null
 5001| Adresse email utilisateur n'est pas valide
@@ -29,7 +29,7 @@ USER| 5000 - 5079
 5023| Les données de l'utilisateur ne sont pas valide
 5024| Erreur lors de l'inscription
 5025| Cet utilisateur n'existe pas 
-EVENT| 5080 - 5099
+event| 5080 - 5099
 ||
 5080| Un user id est obligatoire
 5081| Un titre est obligatoire
@@ -39,12 +39,12 @@ EVENT| 5080 - 5099
 5085| Une date de fin est obligatoire
 5086| Une restriction d'age est obligatoire
 5087| Un status de publication est obligatoire
-AUTHORIZEDDEVICE| 5100 - 5199
+authorizedDevice| 5100 - 5199
 ||
 5100| Veuillez renseigner l'ID de l'utilisateur
 5101| Veuillez renseigner la date de derniere utilisation
 5102| Veuillez renseigner l'ID de l'appareil autorisé
-EMAIL| 5200 - 5299
+email| 5200 - 5299
 ||
 5200| Une seul adresse email d'expédition est requise
 5201| Une adresse email d'expédition est requise
@@ -53,7 +53,7 @@ EMAIL| 5200 - 5299
 5204| Un message est requis
 5205| Adresse email invalide
 5206| Un nom de destinataire est requis
-RESERVATION| 5300 - 5399
+reservation| 5300 - 5399
 ||
 5300| Veuillez renseigner le prénom et le prénom
 5301| Veuillez renseigner l'email
