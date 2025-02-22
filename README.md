@@ -1,6 +1,6 @@
 # MyEasyEvent-back
 
-| Code |        Messag         |
+| Code |        Message        |
 | :--: | :-------------------: |
 1000| Erreur de requête SQL
 1100| Erreur Sendgrid
