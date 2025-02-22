@@ -174,7 +174,7 @@ class UserRepository
     {
         try{
             $user->id = uniqid();
-            $user->password = password_hash(password: $user->password, algo: PASSWORD_DEFAULT, options: ['cost'=>10]);
+            $user->password = password_hash(password: $user->password, algo: PASSWORD_DEFAULT, options: ['cost' => 10]);
             $query = "INSERT INTO users(id,lastName,firstName,email,password,validateDate,isAdmin)VALUES(:id,:lastName,:firstName,:email,:password,:validateDate,:isAdmin)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id',var: $user->id);
@@ -227,8 +227,7 @@ class UserRepository
                 $columnsToUpdate[] = "isDeleted = :isDeleted";
                 $parameters[":isDeleted"] = $user->isDeleted;
             }
-            $query = "UPDATE users set" . implode(separator: ", ",array: $columnsToUpdate) . "WHERE id = :id";
-            $parameters[":id"] = $user->id;
+            $query = "UPDATE users set " . implode(separator: ", ",array: $columnsToUpdate) . " WHERE id = :id";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->execute(params: $parameters);
             return true;

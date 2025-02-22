@@ -82,6 +82,12 @@ $sessionService = new SessionService(
     sessionRepository: $sessionRepository,
     sessionValidationService: $sessionValidationService
 );
+$emailService = new EmailService(
+    tools: $tools,
+    emailFactory: $emailFactory,
+    responseErrorFactory: $responseErrorFactory,
+    emailValidationService: $emailValidationService
+);
 $userService = new UserService(
     tools: $tools,
     userRepository: $userRepository,
@@ -90,12 +96,6 @@ $userService = new UserService(
     responseFactory: $responseFactory,
     responseErrorFactory: $responseErrorFactory,
     emailService: $emailService
-);
-$emailService = new EmailService(
-    tools: $tools,
-    emailFactory: $emailFactory,
-    responseErrorFactory: $responseErrorFactory,
-    emailValidationService: $emailValidationService
 );
 $authorizedDeviceService = new AuthorizedDeviceService(
     tools: $tools,
@@ -112,10 +112,19 @@ $authorizedDeviceService = new AuthorizedDeviceService(
 switch($request->action) {
     case 'connectEmailPass':
         try{
-            if($result = $authorizedDeviceService->ConnectEmailPass(email: $request->email, password: $request->password)){
-                $response = $result;
+            $user = $userService->getUser(key: 'email', value: $request->email);
+            if(!$user instanceof ResponseError){
+                if($userService->userIsValide(user: $user)){
+                    if($result = $authorizedDeviceService->ConnectEmailPass(email: $request->email, password: $request->password)){
+                        $response = $result;
+                    }else{
+                        $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5020, 'message' => "Erreur lors de la connexion avec login et mot de passe"]);
+                    }
+                }else{
+                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5022, 'message' => "Utilisateur non validé, en attente de validation"]);
+                }
             }else{
-                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5020, 'message' => "Erreur lors de la connexion avec login et mot de passe"]);
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5025, 'message' => "Cet utilisateur n'existe pas"]);
             }
         } catch (\Throwable $th) {
             $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
@@ -125,7 +134,6 @@ switch($request->action) {
         try{
             $string = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->token);
             if($device = $authorizedDeviceFactory->createFromString(string: $string)){
-                $tools->logDebug(message: json_encode(value: $device));
                 if($authorizedDeviceService->authorizedDeviceExist(authorizedDeviceId: $device->id)){
                     if($authorizedDeviceService->authorizedDeviceIsValidate(authorizedDevice: $device)){
                         $sessionService->deleteSessionDevice(id: $device->id);
@@ -174,7 +182,12 @@ switch($request->action) {
         break;
     case'subscription':
         try{
-            $newUser = $userFactory->createFromJson(json: $request->user);
+            $newUser = $userFactory->createFromJson(json: json_encode(value: $request->user));
+            if($result = $userService->subscription(newUser: $newUser)){
+                $response = $result;
+            }else{
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5020, 'message' => "Erreur lors de l'inscription"]);
+            }
             
         } catch (\Throwable $th) {
             $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());

@@ -14,6 +14,7 @@ use App\Services\DBConnection;
 use App\Factories\ResponseFactory;
 use App\Factories\ResponseErrorFactory;
 use App\Factories\UserFactory;
+use App\Factories\EmailFactory;
 /**
  * Repositories
  */
@@ -22,6 +23,12 @@ use App\Repositories\UserRepository;
  * Validators
  */
 use App\Validators\UserValidationService;
+use App\Validators\EmailValidationService;
+/**
+ * Services
+ */
+use App\Services\UserService;
+use App\Services\EmailService;
 
 /**
  * Libraries
@@ -34,6 +41,7 @@ $db = new DBConnection();
 $responseFactory = new ResponseFactory();
 $responseErrorFactory = new ResponseErrorFactory();
 $userFactory = new UserFactory();
+$emailFactory = new EmailFactory();
 /**
  * Repositories
  */
@@ -42,6 +50,25 @@ $userRepository = new UserRepository(db: $db, tools: $tools,userFactory: $userFa
  * Validators
  */
 $userValidationService = new UserValidationService(userRepository: $userRepository);
+$emailValidationService = new EmailValidationService();
+/**
+ * Services
+ */
+$emailService = new EmailService(
+    tools: $tools,
+    emailFactory: $emailFactory,
+    responseErrorFactory: $responseErrorFactory,
+    emailValidationService: $emailValidationService
+);
+$userService = new UserService(
+    tools: $tools,
+    userRepository: $userRepository,
+    userValidationService: $userValidationService,
+    userFactory: $userFactory,
+    responseFactory: $responseFactory,
+    responseErrorFactory: $responseErrorFactory,
+    emailService: $emailService
+);
 
 if(isset($_GET['user'])){
     $string = $_GET['user'];

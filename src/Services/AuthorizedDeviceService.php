@@ -171,7 +171,7 @@ class AuthorizedDeviceService
         try{
             $user = $this->userRepository->getUserByEmail(email: $email);
             if($user){
-                if(password_verify( password: $password, hash: $user->password)){
+                if(password_verify(password: $password, hash: $user->password)){
                     $device = $this->registerNewAuthorizedDevice(userId: $user->id);
                     $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $device));
                     $mail = $this->emailService->sendMail(

@@ -27,6 +27,10 @@ USER|5000 - 5079
 5017|Le mot de passe ne correspond pas
 5020|Erreur lors de la connexion avec login et mot de passe
 5021|Erreur lors de la vérification du device
+5022|Utilisateur non validé
+5023|Les données de l'utilisateur ne sont pas valide
+5024|Erreur lors de l'inscription
+5025|CEt utilisateur n'existe pas 
 
 EVENT|5080 - 5099
 ||

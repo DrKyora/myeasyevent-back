@@ -73,12 +73,12 @@ class UserService
         }
     }
 
-    public function subscription(User $newUser)
+    public function subscription(User $newUser): Response
     {
         try{
             if($this->userValidationService->validateCreate(user: $newUser)){
                 $user = $this->userRepository->addUser(user: $newUser);
-                $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: $user);
+                $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $user));
                 $this->emailService->sendMail(
                     addressFrom :[
                         'address' => $_ENV['MAIL_DEFAULT_FROM_ADDRESSE'],
@@ -95,15 +95,17 @@ class UserService
                     subject: 'My easy event inscription',
                     contentsEmails:[
                         '{{UserName}}' => $user->lastName . ' ' . $user->firstName,
-                        '{{DeviceID}}' => $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: $user->id),
+                        '{{UserId}}' => $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: $user->id),
                         '{{URLConfirm}}' => $_ENV['CONFIRM_SUBSCRIPTION_PATH']
                     ],
-                    urlTemplate: __DIR__ . '/../../templates/emails/validateDevice.html'
+                    urlTemplate: __DIR__ . '/../../templates/emails/validateSubscription.html'
                 );
                 return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Utilisateur enregistré", 'data' => ['token' => $token]]);
+            } else {
+                return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5023, 'message' => "Les données de l'utilisateur ne sont pas valide"]);
             }
         } catch (\Exception $e) {
-            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return $this->responseFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
