@@ -67,6 +67,10 @@ reservation| 5300 - 5399
 5303| Une reservation avec cet email existe deja
 5304| Veuillez renseigner votre age
 5305| Vous n'avez pas l'age requis pour cet évement
+||
+catégories| 5400 - 5499
+||
+5400| Veuillez renseigner le nom de la categorie
 
 ---
 

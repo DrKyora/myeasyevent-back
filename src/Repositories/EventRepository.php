@@ -48,20 +48,19 @@ class EventRepository
         }
     }
 
-    public function getEventByUserId(string $userId): Event|null
+    public function getEventByUserId(string $userId): array|null
     {
         try{
             $query = "SELECT * FROM events WHERE userId = :userId AND isDeleted = 0";
             $stmt = $this->db->getConnection()->prepare( query: $query );
             $stmt->bindParam(param: ':userId', var: $userId);
             $stmt->execute();
-            $row = $stmt->fetch( mode: PDO::FETCH_ASSOC );
-            if($row === null){
-                return null;
-            }else{
-                $events = $this->eventFactory->createFromArray(data: $row);
-                return $events;
+            $events = [];
+            while($row = $stmt->fetch( mode: PDO::FETCH_ASSOC )){
+                $event = $this->eventFactory->createFromArray(data: $row);
+                $events[] = $event;
             }
+            return $events;
         }catch(\Exception $e){
             $idError = uniqid();
             $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre userId = {$userId}", errfile: $e->getFile(), errline: $e->getLine());
@@ -239,7 +238,6 @@ class EventRepository
                 $parameters['isDeleted'] = $event->isDeleted;
             }
             $query = "UPDATE events SET" . implode(separator: ", ", array: $columnsToUpdate) . "WHERE id = :id";
-            $parameters[':id'] = $event->id;
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->execute(params: $parameters);
             return true;

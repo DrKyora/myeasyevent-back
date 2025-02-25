@@ -45,16 +45,11 @@ class EventService
         }
     }
 
-    public function getEventsWithUser(string $userId): array|ResponseError
+    public function getEventsByUserId(string $userId): array|ResponseError
     {
         try{
-            $arrayDTOEventUser = [];
             $events = $this->eventRepository->getEventByUserId(userId: $userId);
-            foreach($events as $event){
-                $user = $this->userRepository->getUserById(id: $userId);
-                $arrayDTOEventUser[] = new DTOEventUser(user: $user, event: $event);
-            }
-            return $arrayDTOEventUser;
+            return $events;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }

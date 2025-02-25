@@ -122,9 +122,9 @@ if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
                 $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
             }
             break;
-        case'getEventWithUser':
+        case'getEventByUserId':
             try{
-                $event = $eventService->getEventsWithUser(userId: $request->userId);
+                $event = $eventService->getEventsByUserId(userId: $request->userId);
                 if(!$event instanceof ResponseError){
                     $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Events trouver", 'data' => ['event' => $event]]);
                 } else {
