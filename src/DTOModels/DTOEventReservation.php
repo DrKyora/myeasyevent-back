@@ -8,11 +8,11 @@ use App\Models\Reservation;
 class DTOEventReservation
 {
     public readonly Event $event;
-    public readonly ?Reservation $reservation;
+    public readonly ?array $reservation;
 
     public function __construct(
         Event $event,
-        ?Reservation $reservation
+        ?array $reservation
     ){
         $this->event = $event;
         $this->reservation = $reservation;

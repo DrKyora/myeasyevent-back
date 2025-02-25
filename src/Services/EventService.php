@@ -4,13 +4,13 @@ namespace App\Services;
 
 use App\Factories\EventFactory;
 use App\Models\Event;
-use App\DTOModels\DTOEventUser;
+use App\Models\Reservation;
+use App\DTOModels\DTOEventReservation;
 
-use App\Factories\UserFactory;
 use App\Factories\ResponseErrorFactory;
 
 use App\Repositories\EventRepository;
-use App\Repositories\UserRepository;
+use App\Repositories\ReservationRepository;
 
 use App\Responses\ResponseError;
 
@@ -19,17 +19,19 @@ use App\Validators\EventValidationService;
 class EventService
 {
     private EventRepository $eventRepository;
-    private UserRepository $userRepository;
+    private ReservationRepository $reservationRepository;
     private EventValidationService $eventValidationService;
     private EventFactory $eventFactory;
     private ResponseErrorFactory $responseErrorFactory;
     public function __construct(
         EventRepository $eventRepository,
+        ReservationRepository $reservationRepository,
         EventValidationService $eventValidationService,
         EventFactory $eventFactory,
         ResponseErrorFactory $responseErrorFactory
     ){
         $this->eventRepository = $eventRepository;
+        $this->reservationRepository = $reservationRepository;
         $this->eventValidationService = $eventValidationService;
         $this->eventFactory = $eventFactory;
         $this->responseErrorFactory = $responseErrorFactory;
@@ -49,7 +51,16 @@ class EventService
     {
         try{
             $events = $this->eventRepository->getEventByUserId(userId: $userId);
-            return $events;
+            $arrayDTOEventReservation = [];
+            foreach($events as $event){
+                $arrayReservations = [];
+                $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
+                foreach($reservations as $reservation){
+                    $arrayReservations[] = $reservation;
+                }
+                $arrayDTOEventReservation[] = new DTOEventReservation( event: $event,  reservation: $arrayReservations);
+            }
+            return $arrayDTOEventReservation;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }

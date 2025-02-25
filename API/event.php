@@ -73,6 +73,7 @@ $sessionService = new SessionService(
 );
 $eventService = new EventService(
     eventRepository: $eventRepository,
+    reservationRepository: $reservationRepository,
     eventValidationService: $eventValidationServicen,
     eventFactory: $eventFactory,
     responseErrorFactory: $responseErrorFactory
