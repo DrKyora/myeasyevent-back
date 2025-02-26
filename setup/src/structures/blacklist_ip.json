@@ -2,16 +2,16 @@
     "tableName": "blacklist_ip",
     "columns": [
         {
-            "nameCol": "ipId",
+            "nameCol": "ip",
             "type": "VARCHAR(16)",
             "nullable": false,
             "default": null
         },
         {
-            "nameCol": "isDeleted",
-            "type": "BOOLEAN",
-            "nullable":true,
-            "default": false
+            "nameCol": "blacklist_date",
+            "type": "DATETIME",
+            "nullable": false,
+            "default": null
         }
     ]
 }

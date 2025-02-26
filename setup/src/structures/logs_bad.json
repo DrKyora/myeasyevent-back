@@ -18,12 +18,6 @@
             "type": "DATETIME",
             "nullable": false,
             "default": null
-        },
-        {
-            "nameCol": "isDeleted",
-            "type": "BOOLEAN",
-            "nullable":true,
-            "default": false
         }
     ]
 }
