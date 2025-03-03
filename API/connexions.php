@@ -1,6 +1,4 @@
 <?php
-
-use App\Responses\ResponseError;
 ini_set(option: 'display_errors', value: 1);
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -17,11 +15,15 @@ use App\Factories\AuthorizedDeviceFactory;
 use App\Factories\SessionFactory;
 use App\Factories\UserFactory;
 use App\Factories\EmailFactory;
+use App\Factories\BlacklistUserFactory;
+use App\Factories\BlacklistIpFactory;
 
 // Repositories
 use App\Repositories\UserRepository;
 use App\Repositories\AuthorizedDeviceRepository;
 use App\Repositories\SessionRepository;
+use App\Repositories\BlacklistUserRepository;
+use App\Repositories\BlacklistIpRepository;
 
 // Validators
 use App\Validators\AuthorizedDeviceValidationService;
@@ -35,7 +37,8 @@ use App\Services\SessionService;
 use App\Services\UserService;
 use App\Services\AuthorizedDeviceService;
 use App\Services\EmailService;
-
+//Responses
+use App\Responses\ResponseError;
 $tools = new Tools();
 $db = new DBConnection();
 // Factories
@@ -45,23 +48,15 @@ $authorizedDeviceFactory = new AuthorizedDeviceFactory();
 $sessionFactory = new SessionFactory();
 $userFactory = new UserFactory();
 $emailFactory = new EmailFactory();
+$blacklistUserFactory = new BlacklistUserFactory();
+$blacklistIpFactory = new BlacklistIpFactory();
 
 // Repositories
-$userRepository = new UserRepository(
-    db: $db,
-    tools: $tools,
-    userFactory: $userFactory
-);
-$authorizedDeviceRepository = new AuthorizedDeviceRepository(
-    db: $db,
-    tools: $tools,
-    authorizedDeviceFactory: $authorizedDeviceFactory
-);
-$sessionRepository = new SessionRepository(
-    db: $db,
-    tools: $tools,
-    sessionFactory: $sessionFactory
-);
+$userRepository = new UserRepository(db: $db,tools: $tools,userFactory: $userFactory);
+$authorizedDeviceRepository = new AuthorizedDeviceRepository(db: $db,tools: $tools,authorizedDeviceFactory: $authorizedDeviceFactory);
+$sessionRepository = new SessionRepository(db: $db,tools: $tools,sessionFactory: $sessionFactory);
+$blacklistUserRepository = new BlacklistUserRepository(db: $db,tools: $tools,blacklistUserFactory: $bablacklistUserFactory);
+$blacklistIpRepository = new BlacklistIpRepository(db: $db,tools: $tools,blacklistIpFactory: $blacklistIpFactory);
 
 // Validators
 $authorizedDeviceValidationService = new AuthorizedDeviceValidationService(

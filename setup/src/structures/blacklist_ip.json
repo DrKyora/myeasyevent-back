@@ -8,7 +8,7 @@
             "default": null
         },
         {
-            "nameCol": "blacklist_date",
+            "nameCol": "date",
             "type": "DATETIME",
             "nullable": false,
             "default": null

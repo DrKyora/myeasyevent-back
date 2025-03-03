@@ -14,7 +14,7 @@
             "default": null
         },
         {
-            "nameCol": "log_date",
+            "nameCol": "date",
             "type": "DATETIME",
             "nullable": false,
             "default": null

@@ -71,7 +71,17 @@ reservation| 5300 - 5399
 catégories| 5400 - 5499
 ||
 5400| Veuillez renseigner le nom de la categorie
-
+||
+logsBad| 5500 - 5599
+||
+5500| L'ip ne peut pas être vide
+5501| L'userId ne peut pas être vide
+5502| La date ne peut pas être vide
+||
+blacklist| 5500 - 5599
+||
+5500| Cette adresse IP est blacklisté
+5501| Cet utilisateur est blacklisté
 ---
 
 /**
