@@ -2,6 +2,7 @@
 
 namespace App\Factories;
 
+use App\DTOModels\DTOEvent;
 use App\Models\Event;
 
 class EventFactory
@@ -16,7 +17,6 @@ class EventFactory
             html: $data["html"] ?? null,
             street: $data["street"] ?? null,
             streetNumber: $data["streetNumber"] ?? null,
-            complement: $data["complement"] ?? null,
             zipCode: $data["zipCode"] ?? null,
             city: $data["city"] ?? null,
             country: $data["country"] ?? null,
@@ -39,5 +39,29 @@ class EventFactory
             throw new \Exception(message: "Invalid JSON format");
         }
         return $this->createFromArray(data: $data);
+    }
+
+    public function createDynamic(Event $event, array $fields,?string $userName = null, ?array $address = null, ?array $reservation = null, ?array $user = null, ?array $categories = null, ?array $images = null): DTOEvent
+    {
+        $filteredData = array_intersect_key((array) $event,array_flip($fields));
+        return new DTOEvent(
+            id: $filteredData['id'] ?? null,
+            userName: $userName,
+            title: $filteredData['title'] ?? null,
+            description: $filteredData['description'] ?? null,
+            html: $filteredData['html'] ?? null,
+            address: $address,
+            startDate: $filteredData['startDate'] ?? null,
+            endDate: $filteredData['endDate'] ?? null,
+            publishDate: $filteredData['publishDate'] ?? null,
+            openReservation: $filteredData['openReservation'] ?? null,
+            maxReservation: $filteredData['maxReservation'] ?? null,
+            price: $filteredData['price'] ?? null,
+            ageRestriction: $filteredData['ageRestriction'],
+            reservation: $reservation,
+            user: $user,
+            categories: $categories,
+            images: $images
+        );
     }
 }

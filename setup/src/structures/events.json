@@ -32,15 +32,9 @@
             "default": null
         },
         {
-            "nameCol": "streeNumber",
+            "nameCol": "streetNumber",
             "type": "VARCHAR(100)",
             "nullable": false,
-            "default": null
-        },
-        {
-            "nameCol": "complement",
-            "type": "VARCHAR(500)",
-            "nullable": true,
             "default": null
         },
         {
@@ -107,7 +101,7 @@
             "nameCol": "isOnline",
             "type": "BOOLEAN",
             "nullable": false,
-            "default": null
+            "default": true
         },
         {
             "nameCol": "isDeleted",

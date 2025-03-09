@@ -12,6 +12,7 @@ class ImageToEventFactory
             id: $data['id'] ?? null,
             eventId: $data['eventId'] ?? null,
             fileName: $data['fileName'] ?? null,
+            isThumbnail: $data['isThumbnail'] ?? false,
             isDeleted: $data['isDeleted'] ?? false
         );
     }

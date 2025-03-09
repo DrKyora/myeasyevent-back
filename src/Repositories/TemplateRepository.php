@@ -71,9 +71,10 @@ class TemplateRepository
     {
         try{
             $template->id = uniqid();
-            $query = "INSERT INTO templates(id,description,html,isDeleted)VALUES(:id,:description,:html,:isDeleted)";
+            $query = "INSERT INTO templates(id,title,description,html,isDeleted)VALUES(:id,:title,:description,:html,:isDeleted)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param:':id',var: $template->id);
+            $stmt->bindParam(param:':title',var: $template->title);
             $stmt->bindParam(param:':description',var: $template->description);
             $stmt->bindParam(param:':html',var: $template->html);
             $stmt->bindParam(param:':isDeleted',var: $template->isDeleted);
@@ -91,6 +92,10 @@ class TemplateRepository
         try{
             $columnsToUpdate = [];
             $parameters = [':id' => $template->id];
+            if($template->title !== null){
+                $columnsToUpdate[] = "title = :title";
+                $parameters[':title'] = $template->title;
+            }
             if($template->description !== null){
                 $columnsToUpdate[] = "description = :description";
                 $parameters[':description'] = $template->description;

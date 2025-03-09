@@ -129,17 +129,17 @@ class LogsBadRepository
         }
     }
 
-    public function deleteLog(LogsBad $logsBad): bool
+    public function deleteLog($id): bool
     {
         try{
             $query = "DELETE FROM logsBad WHERE id = :id";
             $stmt = $this->db->getConnection()->prepare(query: $query);
-            $stmt->bindParam(param: ':id', var: $logsBad->id);
+            $stmt->bindParam(param: ':id', var: $id);
             $stmt->execute();
             return true;
         }catch(\Exception $e){
             $idError = uniqid();
-            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre logsBad = " . json_encode(value: $logsBad), errfile: $e->getFile(), errline: $e->getLine());
+            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre id = {$id}", errfile: $e->getFile(), errline: $e->getLine());
             throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
         }
     }

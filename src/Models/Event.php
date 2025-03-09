@@ -11,7 +11,6 @@ class Event
     public ?string $html;
     public ?string $street;
     public ?string $streetNumber;
-    public ?string $complement;
     public ?string $zipCode;
     public ?string $city;
     public ?string $country;
@@ -22,8 +21,8 @@ class Event
     public ?int $maxReservation;
     public ?int $price;
     public ?string $ageRestriction;
-    public ?bool $isOneline;
-    public ?bool $isDeleted;
+    public ?bool $isOneline = true;
+    public ?bool $isDeleted = false;
 
     public function __construct(
         ?string $id,
@@ -33,7 +32,6 @@ class Event
         ?string $html,
         ?string $street,
         ?string $streetNumber,
-        ?string $complement,
         ?string $zipCode,
         ?string $city,
         ?string $country,
@@ -44,8 +42,8 @@ class Event
         ?int $maxReservation,
         ?int $price,
         ?string $ageRestriction,
-        ?bool $isOneline = false,
-        ?bool $isDeleted = false
+        ?bool $isOneline,
+        ?bool $isDeleted
     ){
         $this->id = $id;
         $this->userId = $userId;
@@ -54,7 +52,6 @@ class Event
         $this->html = $html;
         $this->street = $street;
         $this->streetNumber = $streetNumber;
-        $this->complement = $complement;
         $this->zipCode = $zipCode;
         $this->city = $city;
         $this->country = $country;

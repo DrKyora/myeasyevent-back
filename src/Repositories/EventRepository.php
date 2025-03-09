@@ -127,8 +127,8 @@ class EventRepository
     {
         try{
             $event->id = uniqid();
-            $query = "INSERT INTO events(id,userId,title,description,html,street,streetNumber,complement,zipCode,city,country,startDate,endDate,publishDate,openReservation,maxReservation,price,ageRestriction,isOnline,Isdeleted)
-            VALUES(:id,:userId,:title,:description,:html,:street,:streetNumber,:complement,:zipCode,:city,:country,:startDate,:endDate,:publishDate,:openReservation,:maxReservation,:price,:ageRestriction,:isOnline,:isDeleted)";
+            $query = "INSERT INTO events(id,userId,title,description,html,street,streetNumber,zipCode,city,country,startDate,endDate,publishDate,openReservation,maxReservation,price,ageRestriction,isOnline,Isdeleted)
+            VALUES(:id,:userId,:title,:description,:html,:street,:streetNumber,:zipCode,:city,:country,:startDate,:endDate,:publishDate,:openReservation,:maxReservation,:price,:ageRestriction,:isOnline,:isDeleted)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id', var: $event->id);
             $stmt->bindParam(param: ':userId', var: $event->userId);
@@ -137,7 +137,6 @@ class EventRepository
             $stmt->bindParam(param: ':html', var:$event->html);
             $stmt->bindParam(param: ':stret', var: $event->street);
             $stmt->bindParam(param: ':streetNumber', var: $event->streetNumber);
-            $stmt->bindParam(param: ':complement', var: $event->complement);
             $stmt->bindParam(param: ':zipCode', var: $event->zipCode);
             $stmt->bindParam(param: ':city', var: $event->city);
             $stmt->bindParam(param: ':country', var: $event->country);
@@ -184,10 +183,6 @@ class EventRepository
             if($event->streetNumber !== null){
                 $columnsToUpdate[] = 'streetNumber = :streetNumber';
                 $parameters['streetNumber'] = $event->streetNumber;
-            }
-            if($event->complement !== null){
-                $columnsToUpdate[] = 'complement = :complement';
-                $parameters['complement'] = $event->complement;
             }
             if($event->zipCode !== null){
                 $columnsToUpdate[] = 'zipCode = :zipCode';

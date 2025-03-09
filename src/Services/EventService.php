@@ -2,15 +2,22 @@
 
 namespace App\Services;
 
-use App\Factories\EventFactory;
+use App\Models\Category;
 use App\Models\Event;
+use App\Models\ImageToEvent;
 use App\Models\Reservation;
-use App\DTOModels\DTOEventReservation;
+use App\DTOModels\DTOEvent;
 
 use App\Factories\ResponseErrorFactory;
+use App\Factories\EventFactory;
+use App\Factories\ImageToEventFactory;
+use App\Factories\CategoryFactory;
 
 use App\Repositories\EventRepository;
+use App\Repositories\ImageToEventRepository;
 use App\Repositories\ReservationRepository;
+use App\Repositories\UserRepository;
+use App\Repositories\CategoryRepository;
 
 use App\Responses\ResponseError;
 
@@ -20,47 +27,80 @@ class EventService
 {
     private EventRepository $eventRepository;
     private ReservationRepository $reservationRepository;
+    private UserRepository $userRepository;
+    private ImageToEventRepository $imageToEventRepository;
+    private CategoryRepository $categoryRepository;
     private EventValidationService $eventValidationService;
     private EventFactory $eventFactory;
+    private CategoryFactory $categoryFactory;
+    private ImageToEventFactory $imageToEventFactory;
     private ResponseErrorFactory $responseErrorFactory;
     public function __construct(
         EventRepository $eventRepository,
         ReservationRepository $reservationRepository,
+        UserRepository $userRepository,
+        ImageToEventRepository $imageToEventRepository,
+        CategoryRepository $categoryRepository,
         EventValidationService $eventValidationService,
         EventFactory $eventFactory,
+        CategoryFactory $categoryFactory,
+        ImageToEventFactory $imageToEventFactory,
         ResponseErrorFactory $responseErrorFactory
     ){
         $this->eventRepository = $eventRepository;
         $this->reservationRepository = $reservationRepository;
+        $this->userRepository = $userRepository;
+        $this->imageToEventRepository = $imageToEventRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->eventValidationService = $eventValidationService;
         $this->eventFactory = $eventFactory;
+        $this->categoryFactory = $categoryFactory;
+        $this->imageToEventFactory = $imageToEventFactory;
         $this->responseErrorFactory = $responseErrorFactory;
     }
 
-    public function getEventById(string $id): Event|ResponseError
+    public function getEventById(string $id): DTOEvent|ResponseError
     {
         try{
             $event = $this->eventRepository->getEventById(id: $id);
-            return $event;
+            $user = $this->userRepository->getUserById(id: $event->userId);
+            $userName = "{$user->firstName} {$user->lastName}";
+            $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
+            $images = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
+            $categories = $this->categoryRepository->getCategoriesOfEvent(eventId: $event->id);
+            $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
+                foreach($reservations as $reservation){
+                    $arrayReservations = [];
+                    $arrayReservation = [];
+                    $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
+                    $arrayReservations[] = $arrayReservation;
+                }
+                $DTOEvent = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','html','endDate','maxReservation','ageRestriction','price'],address: $arrayAddress,reservation: $arrayReservations,images: $images,categories: $categories,userName: $userName);
+            return $DTOEvent;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
-    public function getEventsByUserId(string $userId): array|ResponseError
+    public function getEventsOfUser(string $userId): array|ResponseError
     {
         try{
             $events = $this->eventRepository->getEventByUserId(userId: $userId);
-            $arrayDTOEventReservation = [];
+            $user = $this->userRepository->getUserById(id: $userId);
+            $userName = "{$user->firstName} {$user->lastName}";
             foreach($events as $event){
-                $arrayReservations = [];
+                $arrayDTOEvent = [];
+                $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
                 $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
                 foreach($reservations as $reservation){
-                    $arrayReservations[] = $reservation;
+                    $arrayReservations = [];
+                    $arrayReservation = [];
+                    $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
+                    $arrayReservations[] = $arrayReservation;
                 }
-                $arrayDTOEventReservation[] = new DTOEventReservation( event: $event,  reservation: $arrayReservations);
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations);
             }
-            return $arrayDTOEventReservation;
+            return $arrayDTOEvent;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
@@ -70,7 +110,21 @@ class EventService
     {
         try{
             $events = $this->eventRepository->getAllEvents();
-            return $events;
+            foreach($events as $event){
+                $user = $this->userRepository->getUserById(id: $event->userId);
+                $userName = "{$user->firstName} {$user->lastName}";
+                $arrayDTOEvent = [];
+                $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
+                $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
+                foreach($reservations as $reservation){
+                    $arrayReservations = [];
+                    $arrayReservation = [];
+                    $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
+                    $arrayReservations[] = $arrayReservation;
+                }
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations);
+            }
+            return $arrayDTOEvent;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
@@ -80,17 +134,40 @@ class EventService
     {
         try{
             $events = $this->eventRepository->search(search: $search);
-            return $events;
+            foreach($events as $event){
+                $user = $this->userRepository->getUserById(id: $event->userId);
+                $userName = "{$user->firstName} {$user->lastName}";
+                $arrayDTOEvent = [];
+                $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
+                $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
+                foreach($reservations as $reservation){
+                    $arrayReservations = [];
+                    $arrayReservation = [];
+                    $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
+                    $arrayReservations[] = $arrayReservation;
+                }
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations);
+            }
+            return $arrayDTOEvent;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
-    public function createEvent(Event $event): Event|ResponseError
+    public function createEvent(Event $event, array $images, array $categories): Event|ResponseError
     {
         try{
             $this->eventValidationService->validate(event: $event);
             $newEvent = $this->eventRepository->addEvent(event: $event);
+            foreach($images as $image){
+                $newImage =$this->imageToEventFactory->createFromArray(data: ['eventId' => $newEvent->id,'fileName' => $image]);
+                $this->imageToEventRepository->addImageToEvent(imageToEvent: $newImage);
+            }
+            foreach($categories as $category){
+                $Category = $this->categoryFactory->createFromArray(data: ['eventId' => $newEvent->id,'name' => $category]);
+                $newCategory = $this->categoryRepository->addCategory(category: $Category);
+                $this->categoryRepository->addCategoryToEvent(eventId: $newCategory->id,categoryId: $event->id);
+            }
             return $newEvent;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);

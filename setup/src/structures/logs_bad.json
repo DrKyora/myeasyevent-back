@@ -10,7 +10,7 @@
         {
             "nameCol": "userId",
             "type": "VARCHAR(16)",
-            "nullable": false,
+            "nullable": true,
             "default": null
         },
         {

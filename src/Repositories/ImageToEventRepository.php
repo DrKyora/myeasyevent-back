@@ -27,6 +27,27 @@ class ImageToEventRepository
         $this->imageToEventFactory = $imageToEventFactory;
     }
 
+    public function getImageToEventById(string $id): ImageToEvent|null
+    {
+        try{
+            $query = "SELECT * FROM images_to_events WHERE id = :id AND isDeleted = 0";
+            $stmt = $this->db->getConnection()->prepare( query: $query );
+            $stmt->bindParam(param: ':id', var: $id);
+            $stmt->execute();
+            $row = $stmt->fetch(mode: PDO::FETCH_ASSOC);
+            if($row){
+                $image = $this->imageToEventFactory->createFromArray(data: $row);
+                return $image;
+            }else{
+                return null;
+            }
+        }catch(\Exception $e){
+            $idError = uniqid();
+            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre id = {$id}", errfile: $e->getFile(), errline: $e->getLine());
+            throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
+        }
+    }
+
     public function getImageToEventByEventId(string $eventId): array|null
     {
         try{
@@ -47,16 +68,37 @@ class ImageToEventRepository
         }
     }
 
+    public function getThumbnailImage(string $eventId): ImageToEvent|null
+    {
+        try{
+            $query = "SELECT * FROM images_to_events WHERE eventId = :eventId AND isThumbnail = 1";
+            $stmt = $this->db->getConnection()->prepare( query: $query );
+            $stmt->bindParam(param: ':eventId', var: $eventId);
+            $stmt->execute();
+            $row = $stmt->fetch( mode: PDO::FETCH_ASSOC );
+            if($row){
+                $image = $this->imageToEventFactory->createFromArray(data: $row);
+                return $image;
+            }else{
+                return null;
+            }
+        }catch(\Exception $e){
+            $idError = uniqid();
+            $this->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage() . "Erreur SQL [" . $idError . "] : " . __METHOD__ . " avec le paramètre eventId = {$eventId}", errfile: $e->getFile(), errline: $e->getLine());
+            throw new \Exception(message: "Erreur SQL : {$idError}", code: 1000);
+        }
+    }
+
     public function addImageToEvent(ImageToEvent $imageToEvent): ?ImageToEvent
     {
         try{
             $imageToEvent->id = uniqid();
-            $query = "INSERT INTO images_to_events (id, eventId, imageId, isDeleted) VALUES (:id, :eventId, :imageId, :isDeleted)";
+            $query = "INSERT INTO images_to_events (id, eventId, fileName, isThumbnail) VALUES (:id, :eventId, :fileName, :isThumbnail)";
             $stmt = $this->db->getConnection()->prepare( query: $query );
             $stmt->bindParam(param: ':id', var: $imageToEvent->id);
             $stmt->bindParam(param: ':eventId', var: $imageToEvent->eventId);
-            $stmt->bindParam(param: ':imageId', var: $imageToEvent->fileName);
-            $stmt->bindParam(param: ':isDeleted', var: $imageToEvent->isDeleted);
+            $stmt->bindParam(param: ':fileName', var: $imageToEvent->fileName);
+            $stmt->bindParam(param:':isThumbnail', var: $imageToEvent->isThumbnail);
             $stmt->execute();
             return $imageToEvent;
         } catch (\Exception $e) {
@@ -78,6 +120,10 @@ class ImageToEventRepository
             if($imageToEvent->fileName !== null){
                 $columnsToUpdate[] = "fileName = :fileName";
                 $parameters['fileName'] = $imageToEvent->fileName;
+            }
+            if($imageToEvent->isThumbnail){
+                $columnsToUpdate[] = 'isThumbnail = :isThumbnail';
+                $parameters['isThumbnail'] = $imageToEvent->isThumbnail;
             }
             if($imageToEvent->isDeleted !== null){
                 $columnsToUpdate[] = "isDeleted = :isDeleted";

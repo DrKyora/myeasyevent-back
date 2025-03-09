@@ -2,8 +2,14 @@
     "tableName" : "templates",
     "columns": [
         {
+            "nameCol": "title",
+            "type": "VARCHAR(255)",
+            "nullable": false,
+            "default": null
+        },
+        {
             "nameCol": "description",
-            "type": "VARCHAR(500)",
+            "type": "TEXT",
             "nullable": false,
             "default": null
         },

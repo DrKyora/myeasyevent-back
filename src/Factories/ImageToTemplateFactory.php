@@ -12,6 +12,7 @@ class ImageToTemplateFactory
             id: $data['id'] ?? null,
             templateId: $data['templateId'] ?? null,
             fileName: $data['fileName'] ?? null,
+            isThumbnail: $data['isThumbnail'] ?? false,
             isDeleted: $data['isDeleted'] ?? false
         );
     }

@@ -12,7 +12,7 @@ session| 4950 - 4999
 4951| La dernière action est manquante
 4953| Erreur lors de la création de la session
 ||
-user| 5000 - 5079
+user| 5000 - 5049
 ||
 5000| Adresse email utilisateur ne peut être null
 5001| Adresse email utilisateur n'est pas valide
@@ -31,6 +31,13 @@ user| 5000 - 5079
 5023| Les données de l'utilisateur ne sont pas valide
 5024| Erreur lors de l'inscription
 5025| Cet utilisateur n'existe pas 
+5026| Trop de tentatives de connexion, compte bloque 5 minutes
+5027| IP ou utilisateur bloque
+||
+template| 5050 - 5079
+||
+5050| Le titre du template ne peut être null
+5051| HTML du template ne peut être null
 ||
 event| 5080 - 5099
 ||
@@ -77,6 +84,7 @@ logsBad| 5500 - 5599
 5500| L'ip ne peut pas être vide
 5501| L'userId ne peut pas être vide
 5502| La date ne peut pas être vide
+5503| Erreur lors de l'ajout du logbad
 ||
 blacklist| 5500 - 5599
 ||

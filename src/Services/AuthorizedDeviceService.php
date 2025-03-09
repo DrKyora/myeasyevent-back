@@ -17,10 +17,12 @@ use App\Models\AuthorizedDevice;
 use App\Factories\AuthorizedDeviceFactory;
 use App\Factories\ResponseErrorFactory;
 use App\Factories\ResponseFactory;
+use App\Factories\LogsBadFactory;
 
 // Repositories
 use App\Repositories\AuthorizedDeviceRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\LogsBadRepository;
 
 // Validators
 use App\Validators\AuthorizedDeviceValidationService;
@@ -35,8 +37,10 @@ class AuthorizedDeviceService
     private AuthorizedDeviceFactory $authorizedDeviceFactory;
     private ResponseErrorFactory $responseErrorFactory;
     private ResponseFactory $responseFactory;
+    private LogsBadFactory $logsBadFactory;
     private AuthorizedDeviceRepository $authorizedDeviceRepository;
     private UserRepository $userRepository;
+    private LogsBadRepository $logsBadRepository;
     private AuthorizedDeviceValidationService $authorizedDeviceValidationService;
     private UserValidationService $userValidationService;
     private EmailService $emailService;
@@ -46,8 +50,10 @@ class AuthorizedDeviceService
         AuthorizedDeviceFactory $authorizedDeviceFactory,
         ResponseErrorFactory $responseErrorFactory,
         ResponseFactory $responseFactory,
+        LogsBadFactory $logsBadFactory,
         AuthorizedDeviceRepository $authorizedDeviceRepository,
         UserRepository $userRepository,
+        LogsBadRepository $logsBadRepository,
         AuthorizedDeviceValidationService $authorizedDeviceValidationService,
         UserValidationService $userValidationService,
         EmailService $emailService
@@ -56,8 +62,10 @@ class AuthorizedDeviceService
         $this->authorizedDeviceFactory = $authorizedDeviceFactory;
         $this->responseErrorFactory = $responseErrorFactory;
         $this->responseFactory = $responseFactory;
+        $this->logsBadFactory = $logsBadFactory;
         $this->authorizedDeviceRepository = $authorizedDeviceRepository;
         $this->userRepository = $userRepository;
+        $this->logsBadRepository = $logsBadRepository;
         $this->authorizedDeviceValidationService = $authorizedDeviceValidationService;
         $this->userValidationService = $userValidationService;
         $this->emailService= $emailService;
@@ -166,16 +174,16 @@ class AuthorizedDeviceService
         }
     }
 
-    public function ConnectEmailPass(string $email,string $password): Response
+    public function ConnectEmailPass(string $email, string $password, string $ip): Response
     {
-        try{
+        try {
             $user = $this->userRepository->getUserByEmail(email: $email);
-            if($user){
-                if(password_verify(password: $password, hash: $user->password)){
+            if ($user) {
+                if (password_verify(password: $password, hash: $user->password)) {
                     $device = $this->registerNewAuthorizedDevice(userId: $user->id);
                     $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $device));
                     $mail = $this->emailService->sendMail(
-                        addressFrom :[
+                        addressFrom: [
                             'address' => $_ENV['MAIL_DEFAULT_FROM_ADDRESSE'],
                             'name' => $_ENV['MAIL_DEFAULT_FROM_NAME'],
                         ],
@@ -197,9 +205,21 @@ class AuthorizedDeviceService
                     );
                     return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Device enregistré", 'data' => ['token' => $token]]);
                 } else {
+                    try {
+                        $newLog = $this->logsBadFactory->createFromArray(data: ['ip' => $ip, 'userId' => $user->id]);
+                        $this->logsBadRepository->addLog(logsBad: $newLog);
+                    } catch (\Exception $e) {
+                        return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5503, 'message' => "Erreur lors de l'ajout du logbad"]);
+                    }
                     return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5017, 'message' => "Le mot de passe ne correspond pas"]);
                 }
             } else {
+                try{
+                    $newLog = $this->logsBadFactory->createFromArray( data: ['ip' => $ip]);
+                    $this->logsBadRepository->addLog(logsBad: $newLog);
+                } catch (\Exception $e) {
+                    return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5503, 'message' => "Erreur lors de l'ajout du logbad"]);
+                }
                 return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5016, 'message' => "Cet utilisateur n'existe pas"]);
             }
         } catch (\Exception $e) {

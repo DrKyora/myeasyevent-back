@@ -16,18 +16,27 @@ use App\Responses\ResponseError;
 use App\Factories\ResponseErrorFactory;
 use App\Factories\SessionFactory;
 use App\Factories\ResponseFactory;
+use App\Factories\AuthorizedDeviceFactory;
 use App\Factories\EventFactory;
 use App\Factories\UserFactory;
+use App\Factories\ImageToEventFactory;
+use App\Factories\CategoryFactory;
+use App\Factories\LogsBadFactory;
 /**
  * Repositories
  */
 use App\Repositories\SessionRepository;
+use App\Repositories\AuthorizedDeviceRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\ImageToEventRepository;
+use App\Repositories\CategoryRepository;
+use App\Repositories\LogsBadRepository;
 /**
  * Validators
  */
 use App\Validators\SessionValidationService;
+use App\Validators\AuthorizedDeviceValidationService;
 use App\Validators\EventValidationService;
 use App\Validators\UserValidationService;
 /**
@@ -35,6 +44,7 @@ use App\Validators\UserValidationService;
  */
 use App\Services\DBConnection;
 use App\Services\SessionService;
+use App\Services\AuthorizedDeviceService;
 use App\Services\EventService;
 /**
  * Libraries
@@ -46,19 +56,28 @@ $tools = new Tools();
  */
 $responseErrorFactory = new ResponseErrorFactory();
 $sessionFactory = new SessionFactory();
+$authorizedDeviceFactory = new AuthorizedDeviceFactory();
 $responseFactory = new ResponseFactory();
 $eventFactory = new EventFactory();
 $userFactory = new UserFactory();
+$categoryFactory = new CategoryFactory();
+$imageToEventFactory = new ImageToEventFactory();
+$logsBadFactory = new LogsBadFactory();
 /**
  * Repositories
  */
 $sessionRepository = new SessionRepository(db: $db, tools: $tools, sessionFactory: $sessionFactory);
+$authorizedDeviceRepository = new AuthorizedDeviceRepository(db: $db, tools: $tools, authorizedDeviceFactory: $authorizedDeviceFactory);
 $eventRepository = new EventRepository(db: $db, tools: $tools, eventFactory: $eventFactory);
 $userRepository = new UserRepository(db: $db, tools: $tools, userFactory: $userFactory);
+$imageToEventRepository = new ImageToEventRepository(db: $db,tools: $tools,imageToEventFactory: $imageToEventFactory);
+$categoryRepository = new CategoryRepository(db: $db,tools: $tools,categoryFactory: $categoryFactory);
+$logsBadRepository = new LogsBadRepository(db: $db,tools: $tools,logsBadFactory: $logsBadFactory);
 /**
  * Validators
  */
 $sessionValidationService = new SessionValidationService();
+$authorizedDeviceValidationService = new AuthorizedDeviceValidationService(tools: $tools,authorizedDeviceRepository: $authorizedDeviceRepository);
 $eventValidationService = new EventValidationService(eventRepository: $eventRepository);
 $userValidationService = new UserValidationService(userRepository: $userRepository);
 /**
@@ -71,11 +90,30 @@ $sessionService = new SessionService(
     sessionValidationService: $sessionValidationService,
     responseErrorFactory: $responseErrorFactory
 );
+$authorizedDeviceService = new AuthorizedDeviceService(
+    tools: $tools,
+    authorizedDeviceFactory: $authorizedDeviceFactory,
+    responseErrorFactory: $responseErrorFactory,
+    responseFactory: $responseFactory,
+    logsBadFactory: $logsBadFactory,
+    authorizedDeviceRepository: $authorizedDeviceRepository,
+    userRepository: $userRepository,
+    logsBadRepository: $logsBadRepository,
+    authorizedDeviceValidationService: $authorizedDeviceValidationService,
+    userValidationService: $userValidationService,
+    emailService: $emailService
+    
+);
 $eventService = new EventService(
     eventRepository: $eventRepository,
     reservationRepository: $reservationRepository,
-    eventValidationService: $eventValidationServicen,
+    userRepository: $userRepository,
+    categoryRepository: $categoryRepository,
+    imageToEventRepository: $imageToEventRepository,
+    eventValidationService: $eventValidationService,
     eventFactory: $eventFactory,
+    imageToEventFactory: $imageToEventFactory,
+    categoryFactory: $categoryFactory,
     responseErrorFactory: $responseErrorFactory
 );
 if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
@@ -85,7 +123,7 @@ if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
         case 'addEvent':
             try{
                 $event = $eventFactory->createFromJson(json: $request->event);
-                $newEvent = $eventService->createEvent(event: $event);
+                $newEvent = $eventService->createEvent(event: $event,images: $request->images, categories: $request->categories);
                 if(!$newEvent instanceof ResponseError){
                     $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Création de l'evenement réussie", 'data' => ['newEvent' => $newEvent]]);
                 } else {
@@ -123,9 +161,9 @@ if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
                 $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
             }
             break;
-        case'getEventByUserId':
+        case'getEventsOfUser':
             try{
-                $event = $eventService->getEventsByUserId(userId: $request->userId);
+                $event = $eventService->getEventsOfUser(userId: $request->userId);
                 if(!$event instanceof ResponseError){
                     $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Events trouver", 'data' => ['event' => $event]]);
                 } else {
@@ -175,7 +213,12 @@ if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
                 $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
             }
             break;
+        default:
+            $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 2000, 'message' => "Le service demandé: " . $request->action . " n'existe pas"]);
+            break;
     }
+    $device = $authorizedDeviceService->getAuthorizedDeviceById( deviceId: $session->deviceId);
+    $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $device->id);
 } else {
     $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Pas de session valable, l'utilisateur doit se reconnecter"]);
 }

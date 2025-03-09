@@ -14,6 +14,12 @@
             "default": null
         },
         {
+            "nameCol": "isThumbnail",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "default": false
+        },
+        {
             "nameCol": "isDeleted",
             "type": "BOOLEAN",
             "nullable":true,

@@ -6,7 +6,6 @@ use App\Lib\Tools;
 
 use App\Models\BlacklistUser;
 
-use App\Factories\BlacklistUserFactory;
 use App\Factories\ResponseErrorFactory;
 
 use App\Repositories\BlacklistUserRepository;
@@ -18,20 +17,17 @@ use App\Validators\BlacklistUserValidationService;
 class BlacklistUserService
 {
     private Tools $tools;
-    private BlacklistUser $blacklistUser;
     private ResponseErrorFactory $responseErrorFactory;
     private BlacklistUserRepository $blacklistUserRepository;
     private BlacklistUserValidationService $blacklistUserValidationService;
 
     public function __construct(
         Tools $tools,
-        BlacklistUser $blacklistUser,
         ResponseErrorFactory $responseErrorFactory,
         BlacklistUserRepository $blacklistUserRepository,
         BlacklistUserValidationService $blacklistUserValidationService
     ){
         $this->tools = $tools;
-        $this->blacklistUser = $blacklistUser;
         $this->responseErrorFactory = $responseErrorFactory;
         $this->blacklistUserRepository = $blacklistUserRepository;
         $this->blacklistUserValidationService = $blacklistUserValidationService;
