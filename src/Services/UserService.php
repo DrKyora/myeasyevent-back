@@ -46,7 +46,7 @@ class UserService
         $this->emailService = $emailService;
     }
 
-    public function getUser(string $key, string $value): User|ResponseError
+    public function getUser(string $key, string $value): User|ResponseError|null
     {
         try {
             switch ($key) {
@@ -140,7 +140,7 @@ class UserService
         }
     }
 
-    public function userExist(string $userId = null): User|ResponseError|null
+    public function userExist(?string $userId = null): User|ResponseError|null
     {
         try{
             if($user = $this->userRepository->getUserById(id: $userId)){

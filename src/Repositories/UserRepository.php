@@ -56,7 +56,7 @@ class UserRepository
             $stmt->bindParam(param: ':email' , var: $email);
             $stmt->execute();
             $row = $stmt->fetch(mode: PDO::FETCH_ASSOC);
-            if($row === null){
+            if($row === false){
                 return null;
             }else{
                 $user = $this->userFactory->createFromArray(data: $row);
@@ -139,7 +139,7 @@ class UserRepository
         }
     }
 
-    public function emailUserExist(string $emailToVerif, string $excludedId = null): bool
+    public function emailUserExist(string $emailToVerif, ?string $excludedId = null): bool
     {
         try {
             if ($excludedId !== null) {

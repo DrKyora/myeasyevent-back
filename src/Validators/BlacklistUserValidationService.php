@@ -30,6 +30,6 @@ class BlacklistUserValidationService
         if($this->blacklistUserRepository->getBlacklistUsersByUserId(userId: $userId)){
             throw new \Exception(message: "Cet utilisateur est blacklisté", code: 5501);
         }
-        return true;
+        return false;
     }
 }

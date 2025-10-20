@@ -8,11 +8,13 @@ use App\Lib\Tools;
 use App\Factories\ResponseFactory;
 use App\Factories\ResponseErrorFactory;
 use App\Factories\AuthorizedDeviceFactory;
+use App\Factories\LogsBadFactory;
 use App\Factories\EmailFactory;
 use App\Factories\UserFactory;
 
 use App\Repositories\UserRepository;
 use App\Repositories\AuthorizedDeviceRepository;
+use App\Repositories\LogsBadRepository;
 
 
 use App\Validators\AuthorizedDeviceValidationService;
@@ -29,10 +31,12 @@ $db = new DBConnection();
 $responseFactory = new ResponseFactory();
 $responseErrorFactory = new ResponseErrorFactory();
 $authorizedDeviceFactory = new AuthorizedDeviceFactory();
+$logsBadFactory = new LogsBadFactory();
 $emailFactory = new EmailFactory();
 $userFactory = new UserFactory();
 $userRepository = new UserRepository(db: $db, tools: $tools,userFactory: $userFactory);
 $authorizedDeviceRepository = new AuthorizedDeviceRepository(db: $db, tools: $tools,authorizedDeviceFactory: $authorizedDeviceFactory);
+$logsBadRepository = new LogsBadRepository(db: $db, tools: $tools, logsBadFactory: $logsBadFactory);
 $authorizedDeviceValidationService = new AuthorizedDeviceValidationService(tools: $tools,authorizedDeviceRepository: $authorizedDeviceRepository);
 $userValidationService = new UserValidationService(userRepository: $userRepository);
 $emailValidationService = new EmailValidationService();
@@ -41,14 +45,16 @@ $emailValidationService = new EmailValidationService();
 $emailService = new EmailService(responseErrorFactory: $responseErrorFactory, emailValidationService: $emailValidationService, emailFactory: $emailFactory, tools: $tools);
 $authorizedDeviceService = new AuthorizedDeviceService(
     tools: $tools,
-    userRepository: $userRepository,
-    authorizedDeviceRepository: $authorizedDeviceRepository,
     authorizedDeviceFactory: $authorizedDeviceFactory,
+    responseErrorFactory: $responseErrorFactory,
+    responseFactory: $responseFactory,
+    logsBadFactory: $logsBadFactory,
+    authorizedDeviceRepository: $authorizedDeviceRepository,
+    userRepository: $userRepository,
+    logsBadRepository: $logsBadRepository,
     authorizedDeviceValidationService: $authorizedDeviceValidationService,
     userValidationService: $userValidationService,
-    emailService: $emailService,
-    responseErrorFactory: $responseErrorFactory,
-    responseFactory: $responseFactory
+    emailService: $emailService
 );
 
 

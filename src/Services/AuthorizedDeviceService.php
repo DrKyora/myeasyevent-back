@@ -123,7 +123,7 @@ class AuthorizedDeviceService
         }
     }
 
-    public function authorizedDeviceExist(string $authorizedDeviceId = null): AuthorizedDevice|ResponseError|null
+    public function authorizedDeviceExist(?string $authorizedDeviceId = null): AuthorizedDevice|ResponseError|null
     {
         try{
             if($device = $this->authorizedDeviceRepository->getAuthorizedDeviceById(deviceId: $authorizedDeviceId)){
@@ -182,7 +182,7 @@ class AuthorizedDeviceService
                 if (password_verify(password: $password, hash: $user->password)) {
                     $device = $this->registerNewAuthorizedDevice(userId: $user->id);
                     $token = $this->tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $device));
-                    $mail = $this->emailService->sendMail(
+                    $this->emailService->sendMail(
                         addressFrom: [
                             'address' => $_ENV['MAIL_DEFAULT_FROM_ADDRESSE'],
                             'name' => $_ENV['MAIL_DEFAULT_FROM_NAME'],
@@ -206,7 +206,11 @@ class AuthorizedDeviceService
                     return $this->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Device enregistré", 'data' => ['token' => $token]]);
                 } else {
                     try {
-                        $newLog = $this->logsBadFactory->createFromArray(data: ['ip' => $ip, 'userId' => $user->id]);
+                        $newLog = $this->logsBadFactory->createFromArray(data: [
+                            'ip' => $ip,
+                            'userId' => $user->id,
+                            'date' => (new \DateTime())->format(format: 'Y-m-d H:i:s')
+                        ]);
                         $this->logsBadRepository->addLog(logsBad: $newLog);
                     } catch (\Exception $e) {
                         return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5503, 'message' => "Erreur lors de l'ajout du logbad"]);
@@ -215,7 +219,10 @@ class AuthorizedDeviceService
                 }
             } else {
                 try{
-                    $newLog = $this->logsBadFactory->createFromArray( data: ['ip' => $ip]);
+                    $newLog = $this->logsBadFactory->createFromArray( data: [
+                        'ip' => $ip,
+                        'date' => (new \DateTime())->format(format: 'Y-m-d H:i:s')
+                    ]);
                     $this->logsBadRepository->addLog(logsBad: $newLog);
                 } catch (\Exception $e) {
                     return $this->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5503, 'message' => "Erreur lors de l'ajout du logbad"]);

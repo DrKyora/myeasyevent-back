@@ -29,7 +29,7 @@ class BlacklistUserRepository
     public function getBlacklistUsers(): array
     {
         try{
-            $query = "SELECT * FROM blacklist_user";
+            $query = "SELECT * FROM blacklist_users";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->execute();
             $blacklistUsers = [];
@@ -48,11 +48,11 @@ class BlacklistUserRepository
     public function getBlacklistUsersByUserId(string $userId): BlacklistUser|null
     {
         try{
-            $query = "SELECT * FROM blacklist_user WHERE userId = :userId";
+            $query = "SELECT * FROM blacklist_users WHERE userId = :userId";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':userId', var: $userId);
             $stmt->execute();
-            $row = $stmt->fetchAll(mode: PDO::FETCH_ASSOC);
+            $row = $stmt->fetch(mode: PDO::FETCH_ASSOC);
             if($row === false){
                 return null;
             }else{
@@ -69,7 +69,7 @@ class BlacklistUserRepository
     public function addBlacklistUser(BlacklistUser $blacklistUser): BlacklistUser
     {
         try{
-            $query = "INSERT INTO blacklist_user (id,userId,date) VALUES (:id,:userId,:date)";
+            $query = "INSERT INTO blacklist_users (id,userId,date) VALUES (:id,:userId,:date)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id', var: $blacklistUser->id);
             $stmt->bindParam(param: ':userId', var: $blacklistUser->userId);
@@ -86,7 +86,7 @@ class BlacklistUserRepository
     public function deleteBlacklistUser(BlacklistUser $blacklistUser): bool
     {
         try{
-            $query = "DELETE FROM blacklist_user WHERE id = :id";
+            $query = "DELETE FROM blacklist_users WHERE id = :id";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id', var: $blacklistUser->id);
             $stmt->execute();

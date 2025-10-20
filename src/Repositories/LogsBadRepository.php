@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/config.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../config.php';
 
 use PDO;
 
@@ -95,7 +95,7 @@ class LogsBadRepository
     {
         try{
             $logsBad->id = uniqid();
-            $query = "INSERT INTO logs_bad (id,ip,userId,logDate) VALUES (:id,:ip,:userId,:logDate)";
+            $query = "INSERT INTO logs_bad (id,ip,userId,`date`) VALUES (:id,:ip,:userId,:logDate)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id', var: $logsBad->id);
             $stmt->bindParam(param: ':ip', var: $logsBad->ip);
@@ -113,7 +113,7 @@ class LogsBadRepository
     public function numberOflogs(string $ip, ?string $userId = null): int
     {
         try {
-            $query = "SELECT COUNT(*) as count FROM logs_bad WHERE ip = :ip" . ($userId ? " AND userId = :userId" : "") . " AND logDate > DATE_SUB(NOW(), INTERVAL " . $_ENV["CONNECTION_WAIT_TIME"] . " MINUTE)";
+            $query = "SELECT COUNT(*) as count FROM logs_bad WHERE ip = :ip" . ($userId ? " AND userId = :userId" : "") . " AND `date` > DATE_SUB(NOW(), INTERVAL " . $_ENV["CONNECTION_WAIT_TIME"] . " MINUTE)";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':ip', var: $ip);
             if ($userId) {
@@ -132,7 +132,7 @@ class LogsBadRepository
     public function deleteLog($id): bool
     {
         try{
-            $query = "DELETE FROM logsBad WHERE id = :id";
+            $query = "DELETE FROM logs_bad WHERE id = :id";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ':id', var: $id);
             $stmt->execute();

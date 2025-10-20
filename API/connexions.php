@@ -67,7 +67,7 @@ $logsBadFactory = new LogsBadFactory();
 $userRepository = new UserRepository(db: $db,tools: $tools,userFactory: $userFactory);
 $authorizedDeviceRepository = new AuthorizedDeviceRepository(db: $db,tools: $tools,authorizedDeviceFactory: $authorizedDeviceFactory);
 $sessionRepository = new SessionRepository(db: $db,tools: $tools,sessionFactory: $sessionFactory);
-$blacklistUserRepository = new BlacklistUserRepository(db: $db,tools: $tools,blacklistUserFactory: $bablacklistUserFactory);
+$blacklistUserRepository = new BlacklistUserRepository(db: $db,tools: $tools,blacklistUserFactory: $blacklistUserFactory);
 $blacklistIpRepository = new BlacklistIpRepository(db: $db,tools: $tools,blacklistIpFactory: $blacklistIpFactory);
 $logsBadRepository = new LogsBadRepository(db: $db,tools: $tools,logsBadFactory: $logsBadFactory);
 
@@ -144,7 +144,7 @@ switch($request->action) {
         try{
             $ip = $_SERVER['REMOTE_ADDR'];
             $user = $userService->getUser(key: 'email', value: $request->email);
-            if(!$user instanceof ResponseError){
+            if(!$user instanceof ResponseError && $user !== null){
                 if(!$blacklistIpValidationService->isBlacklist(ip: $ip) OR !$blacklistUserValidationService->isBlacklist(userId: $user->id)){
                     if($logsBadService->countLogs(ip: $ip, email: $request->email) < 3){
                         if($userService->userIsValide(user: $user)){
