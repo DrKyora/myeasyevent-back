@@ -1,22 +1,16 @@
-# /www/myeasyevent-back/.htaccess
-
+# Charset et options de base
 AddDefaultCharset UTF-8
 Options -Indexes -MultiViews
 
-# Pas de RewriteRule ici : on laisse les .php s'exécuter normalement
-
+# CORS simplifié (plus compatible)
 <IfModule mod_headers.c>
-    SetEnvIf Origin "^https?://localhost(:[0-9]+)?$" ORIGIN_OK=1
-    SetEnvIf Origin "^https?://127\.0\.0\.1(:[0-9]+)?$" ORIGIN_OK=1
-    SetEnvIf Origin "^https://myeasyevent\.be$" ORIGIN_OK=1
-
     Header always set Access-Control-Allow-Credentials "true"
     Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
     Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
-    Header always set Access-Control-Allow-Origin "%{Origin}e" env=ORIGIN_OK
+    Header always set Access-Control-Allow-Origin "https://myeasyevent.be"
 </IfModule>
 
 # Sécurité fichiers sensibles
-<FilesMatch "(^\.env|composer\.json|composer\.lock|package\.json|symfony\.lock|node_modules|\.git)">
+<FilesMatch "(^\.env|composer\.(json|lock)|\.git)">
     Require all denied
 </FilesMatch>

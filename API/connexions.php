@@ -1,11 +1,8 @@
 <?php
 
-
-ini_set(option: 'display_errors', value: 1);
-
-require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config.php';
-header(header: 'Access-Control-Allow-Origin: ' . $_ENV['FRONT_END_URL']);
+require __DIR__ . '/../vendor/autoload.php';
+
 $request = json_decode(json: file_get_contents(filename: 'php://input'));
 // Library
 use App\Lib\Tools;

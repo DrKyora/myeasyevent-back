@@ -33,4 +33,7 @@ switch ($_SERVER['SERVER_NAME']) {
     case 'localhost':
         loadEnv(path: __DIR__ . '/localhost.env');
         break;
+    case 'myeasyevent.be':
+        loadEnv(path: __DIR__ . '/.env');
+        break;
 }
