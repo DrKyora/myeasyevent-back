@@ -167,34 +167,37 @@ switch($request->action) {
         }
         break;
     case'connectWToken':
-        try{
-            $string = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->token);
-            if($device = $authorizedDeviceFactory->createFromString(string: $string)){
-                if($authorizedDeviceService->authorizedDeviceExist(authorizedDeviceId: $device->id)){
-                    if($authorizedDeviceService->authorizedDeviceIsValidate(authorizedDevice: $device)){
-                        $sessionService->deleteSessionDevice(id: $device->id);
-                        $lastAction = (new \DateTime())->format(format: 'Y-m-d H:i:s');
-                        $session = $sessionService->createSession(userId: $device->userId, deviceId: $device->id, lastAction: $lastAction);
-                        if($session instanceof App\Models\Session){
-                            $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $device->id);
-                            $tokenSession = $tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $session));
-                            $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Token correct", 'data' => ['session' => $tokenSession]]);
-                        } else {
-                            $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 4953, 'message' => "Erreur lors de la création de la session"]);
-                        }
+    try{
+        $string = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->token);
+        if($device = $authorizedDeviceFactory->createFromString(string: $string)){
+            if($authorizedDeviceService->authorizedDeviceExist(authorizedDeviceId: $device->id)){
+                // 🔥 CORRECTION : Récupérer le device depuis la BDD pour avoir validateDate à jour
+                $deviceFromDB = $authorizedDeviceService->getAuthorizedDeviceById(deviceId: $device->id);
+                
+                if($authorizedDeviceService->authorizedDeviceIsValidate(authorizedDevice: $deviceFromDB)){
+                    $sessionService->deleteSessionDevice(id: $deviceFromDB->id);
+                    $lastAction = (new \DateTime())->format(format: 'Y-m-d H:i:s');
+                    $session = $sessionService->createSession(userId: $deviceFromDB->userId, deviceId: $deviceFromDB->id, lastAction: $lastAction);
+                    if($session instanceof App\Models\Session){
+                        $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $deviceFromDB->id);
+                        $tokenSession = $tools->encrypt_decrypt(action: 'encrypt', stringToTreat: json_encode(value: $session));
+                        $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Token correct", 'data' => ['session' => $tokenSession]]);
                     } else {
-                        $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5011, 'message' => "Ce device n'est pas valide"]);
+                        $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 4953, 'message' => "Erreur lors de la création de la session"]);
                     }
                 } else {
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5015, 'message' => "Ce device n'a pas encore été enregistré"]);
+                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5011, 'message' => "Ce device n'est pas valide"]);
                 }
             } else {
-                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5021, 'message' => "Erreur lors de la vérification du device"]);
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5015, 'message' => "Ce device n'a pas encore été enregistré"]);
             }
-        } catch (\Throwable $th) {
-            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        } else {
+            $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5021, 'message' => "Erreur lors de la vérification du device"]);
         }
-        break;
+    } catch (\Throwable $th) {
+        $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+    }
+    break;
     case'checkSession':
         try{
             $sessionIsValide = $sessionService->tokenSessionIsValide(tokenSession: $request->session);
