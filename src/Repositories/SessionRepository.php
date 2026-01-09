@@ -155,7 +155,7 @@ class SessionRepository
     public function DeleteSessionDevice(string $deviceId): bool
     {
         try{
-            $query = "DELETE * FROM users_sessions WHERE deviceId = :id AND isDeleted = 0";
+            $query = "DELETE FROM sessions WHERE deviceId = :id AND isDeleted = 0";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param: ":id", var: $deviceId);
             $stmt->execute();

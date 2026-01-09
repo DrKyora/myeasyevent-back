@@ -21,7 +21,7 @@ class Event
     public ?int $maxReservation;
     public ?int $price;
     public ?string $ageRestriction;
-    public ?bool $isOneline = true;
+    public ?bool $isOnline = true;
     public ?bool $isDeleted = false;
 
     public function __construct(
@@ -42,7 +42,7 @@ class Event
         ?int $maxReservation,
         ?int $price,
         ?string $ageRestriction,
-        ?bool $isOneline,
+        ?bool $isOnline,
         ?bool $isDeleted
     ){
         $this->id = $id;
@@ -62,7 +62,7 @@ class Event
         $this->maxReservation = $maxReservation;
         $this->price = $price;
         $this->ageRestriction = $ageRestriction;
-        $this->isOneline = $isOneline;
+        $this->isOnline = $isOnline;
         $this->isDeleted = $isDeleted;
     }
 }

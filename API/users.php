@@ -16,12 +16,9 @@ use App\Factories\ResponseErrorFactory;
 use App\Factories\SessionFactory;
 use App\Factories\ResponseFactory;
 use App\Factories\AuthorizedDeviceFactory;
-use App\Factories\LogsBadFactory;
-use App\Factories\EmailFactory;
-use App\Factories\TemplateFactory;
-use App\Factories\ImageToTemplateFactory;
-use App\Factories\CategoryFactory;
 use App\Factories\UserFactory;
+use App\Factories\EmailFactory;
+use App\Factories\LogsBadFactory;
 /**
  * Repositories
  */
@@ -29,18 +26,13 @@ use App\Repositories\SessionRepository;
 use App\Repositories\AuthorizedDeviceRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\LogsBadRepository;
-use App\Repositories\TemplateRepository;
-use App\Repositories\ImageToTemplateRepository;
-use App\Repositories\CategoryRepository;
 /**
  * Validators
  */
 use App\Validators\SessionValidationService;
 use App\Validators\AuthorizedDeviceValidationService;
-use App\Validators\EmailValidationService;
-use App\Validators\TemplateValidationService;
-use App\Validators\CategoryValidationService;
 use App\Validators\UserValidationService;
+use App\Validators\EmailValidationService;
 /**
  * Services
  */
@@ -48,7 +40,7 @@ use App\Services\DBConnection;
 use App\Services\SessionService;
 use App\Services\AuthorizedDeviceService;
 use App\Services\EmailService;
-use App\Services\TemplateService;
+use App\Services\UserService;
 /**
  * Libraries
  */
@@ -61,12 +53,9 @@ $responseErrorFactory = new ResponseErrorFactory();
 $sessionFactory = new SessionFactory();
 $authorizedDeviceFactory = new AuthorizedDeviceFactory();
 $responseFactory = new ResponseFactory();
-$logsBadFactory = new LogsBadFactory();
-$emailFactory = new EmailFactory();
-$templateFactory = new TemplateFactory();
-$imageToTemplateFactory = new ImageToTemplateFactory();
-$categoryFactory = new CategoryFactory();
 $userFactory = new UserFactory();
+$emailFactory = new EmailFactory();
+$logsBadFactory = new LogsBadFactory();
 /**
  * Repositories
  */
@@ -74,18 +63,13 @@ $sessionRepository = new SessionRepository(db: $db, tools: $tools, sessionFactor
 $authorizedDeviceRepository = new AuthorizedDeviceRepository(db: $db, tools: $tools, authorizedDeviceFactory: $authorizedDeviceFactory);
 $userRepository = new UserRepository(db: $db, tools: $tools, userFactory: $userFactory);
 $logsBadRepository = new LogsBadRepository(db: $db,tools: $tools,logsBadFactory: $logsBadFactory);
-$templateRepository = new TemplateRepository(db: $db, tools: $tools, templateFactory: $templateFactory);
-$imageToTemplateRepository = new ImageToTemplateRepository(db: $db, tools: $tools, imageToTemplateFactory: $imageToTemplateFactory);
-$categoryRepository = new CategoryRepository(db: $db, tools: $tools, categoryFactory: $categoryFactory);
 /**
  * Validators
  */
 $sessionValidationService = new SessionValidationService();
 $authorizedDeviceValidationService = new AuthorizedDeviceValidationService(tools: $tools,authorizedDeviceRepository: $authorizedDeviceRepository);
-$emailValidationService = new EmailValidationService();
-$templateValidationService = new TemplateValidationService();
-$categoryValidationService = new CategoryValidationService();
 $userValidationService = new UserValidationService(userRepository: $userRepository);
+$emailValidationService = new EmailValidationService();
 /**
  * Services
  */
@@ -114,46 +98,78 @@ $authorizedDeviceService = new AuthorizedDeviceService(
     authorizedDeviceValidationService: $authorizedDeviceValidationService,
     userValidationService: $userValidationService,
     emailService: $emailService
+    
 );
-$templateService = new TemplateService(
-    templateFactory: $templateFactory,
-    imageToTemplateFactory: $imageToTemplateFactory,
-    categoryFactory: $categoryFactory,
+$userService = new UserService(
+    tools: $tools,
+    userFactory: $userFactory,
+    userRepository: $userRepository,
+    responseFactory: $responseFactory,
     responseErrorFactory: $responseErrorFactory,
-    templateRepository: $templateRepository,
-    imageToTemplateRepository: $imageToTemplateRepository,
-    categoryRepository: $categoryRepository,
-    templateValidationService: $templateValidationService,
-    categoryValidationService: $categoryValidationService
+    userValidationService: $userValidationService,
+    emailService: $emailService
 );
 
 if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
     $sessionString = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->session);
     $session = $sessionFactory->createFromJson(json: $sessionString);
     switch($request->action){
-        case 'getAllTemplates':
+        case'getUser':
             try{
-                $templates = $templateService->getAllTemplates();
-                if(!$templates instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Tous les templates trouvés", 'data' => ['templates' => $templates]]);
-                } else {
-                    $error = $templates;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
+                $userFull = $userService->getUser(key: 'id', value: $session->userId);
+                $filterdUser = $userFactory->createDynamic(user: $userFull, fields: ['lastName', 'firstName', 'email']);
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Utilisateur récupéré avec succès", 'data' =>['user'  => $filterdUser]]);
+            } catch (\Exception $e) {
                 $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
             }
             break;
-        case 'getTemplateById':
+        case'updateUserPassword':
             try{
-                $template = $templateService->getTemplateById(id: $request->id);
-                if(!$template instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Template trouvé", 'data' => ['template' => $template]]);
+                $user = $userService->getUser(key: 'id', value: $session->userId);
+                $user->password = $request->newPassword;
+                $userValidationService->validateUpdateWithPassword(user: $user);
+                $response = $userService->UpdateUserWithPassword(user: $user);
+                if(!$response instanceof ResponseError){
+                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Mise à jour du password de l'utilisateur réussie"]);
                 } else {
-                    $error = $template;
+                    $error = $response;
                     $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
                 }
-            } catch (\Throwable $th) {
+            } catch (\Exception $e) {
+                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+            }
+            break;
+        case'updateUserEmail':
+            try{
+                $user = $userService->getUser(key: 'id', value: $session->userId);
+                $user->email = $request->email;
+                $userValidationService->validateUpdate(user: $user);
+                $response = $userService->updateUser(user: $user);
+                if(!$response instanceof ResponseError){
+                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Mise à jour de l'email de l'utilisateur réussie"]);
+                } else {
+                    $error = $response;
+                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                }
+            } catch (\Exception $e) {
+                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+            }
+            break;
+        case'updateUserProfile':
+            try{
+                $userToUpdate = $userService->getUser(key: 'id', value: $session->userId);
+                $user = $userFactory->createFromJson(json: json_encode(value: $request->user));
+                $user->id = $userToUpdate->id;
+                $user->email = $userToUpdate->email;
+                $userValidationService->validateUpdate(user: $user);
+                $response = $userService->updateUser(user: $user);
+                if(!$response instanceof ResponseError){
+                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Mise à jour du profil de l'utilisateur réussie"]);
+                } else {
+                    $error = $response;
+                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                }
+            } catch (\Exception $e) {
                 $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
             }
             break;

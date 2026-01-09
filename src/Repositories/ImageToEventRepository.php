@@ -51,7 +51,7 @@ class ImageToEventRepository
     public function getImageToEventByEventId(string $eventId): array|null
     {
         try{
-            $query = "SELECT * FROM images_to_events WHERE eventId = :eventId AND isDeleted = 0";
+            $query = "SELECT * FROM images_to_event WHERE eventId = :eventId AND isDeleted = 0";
             $stmt = $this->db->getConnection()->prepare( query: $query );
             $stmt->bindParam(param: ':eventId', var: $eventId);
             $stmt->execute();

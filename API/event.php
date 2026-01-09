@@ -21,6 +21,8 @@ use App\Factories\UserFactory;
 use App\Factories\ImageToEventFactory;
 use App\Factories\CategoryFactory;
 use App\Factories\LogsBadFactory;
+use App\Factories\EmailFactory;
+use App\Factories\ReservationFactory;
 /**
  * Repositories
  */
@@ -31,6 +33,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\ImageToEventRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\LogsBadRepository;
+use App\Repositories\ReservationRepository;
 /**
  * Validators
  */
@@ -38,6 +41,7 @@ use App\Validators\SessionValidationService;
 use App\Validators\AuthorizedDeviceValidationService;
 use App\Validators\EventValidationService;
 use App\Validators\UserValidationService;
+use App\Validators\EmailValidationService;
 /**
  * Services
  */
@@ -45,6 +49,7 @@ use App\Services\DBConnection;
 use App\Services\SessionService;
 use App\Services\AuthorizedDeviceService;
 use App\Services\EventService;
+use App\Services\EmailService;
 /**
  * Libraries
  */
@@ -62,6 +67,8 @@ $userFactory = new UserFactory();
 $categoryFactory = new CategoryFactory();
 $imageToEventFactory = new ImageToEventFactory();
 $logsBadFactory = new LogsBadFactory();
+$emailFactory = new EmailFactory();
+$reservationFactory = new ReservationFactory();
 /**
  * Repositories
  */
@@ -72,6 +79,7 @@ $userRepository = new UserRepository(db: $db, tools: $tools, userFactory: $userF
 $imageToEventRepository = new ImageToEventRepository(db: $db,tools: $tools,imageToEventFactory: $imageToEventFactory);
 $categoryRepository = new CategoryRepository(db: $db,tools: $tools,categoryFactory: $categoryFactory);
 $logsBadRepository = new LogsBadRepository(db: $db,tools: $tools,logsBadFactory: $logsBadFactory);
+$reservationRepository = new ReservationRepository(db: $db,tools: $tools, factory: $reservationFactory);
 /**
  * Validators
  */
@@ -79,6 +87,7 @@ $sessionValidationService = new SessionValidationService();
 $authorizedDeviceValidationService = new AuthorizedDeviceValidationService(tools: $tools,authorizedDeviceRepository: $authorizedDeviceRepository);
 $eventValidationService = new EventValidationService(eventRepository: $eventRepository);
 $userValidationService = new UserValidationService(userRepository: $userRepository);
+$emailValidationService = new EmailValidationService();
 /**
  * Services
  */
@@ -88,6 +97,12 @@ $sessionService = new SessionService(
     sessionRepository: $sessionRepository,
     sessionValidationService: $sessionValidationService,
     responseErrorFactory: $responseErrorFactory
+);
+$emailService = new EmailService(
+    tools: $tools,
+    emailFactory: $emailFactory,
+    responseErrorFactory: $responseErrorFactory,
+    emailValidationService: $emailValidationService
 );
 $authorizedDeviceService = new AuthorizedDeviceService(
     tools: $tools,
@@ -115,110 +130,109 @@ $eventService = new EventService(
     categoryFactory: $categoryFactory,
     responseErrorFactory: $responseErrorFactory
 );
-if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
-    $sessionString = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->session);
-    $session = $sessionFactory->createFromJson(json: $sessionString);
-    switch($request->action){
-        case 'addEvent':
-            try{
-                $event = $eventFactory->createFromJson(json: $request->event);
-                $newEvent = $eventService->createEvent(event: $event,images: $request->images, categories: $request->categories);
-                if(!$newEvent instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Création de l'evenement réussie", 'data' => ['newEvent' => $newEvent]]);
-                } else {
-                    $error = $newEvent;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+
+
+switch($request->action){
+    case 'addEvent':
+        try{
+            $session = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->session);
+            $sessionObj = $sessionFactory->createFromJson(json: $session);
+            $event = $eventFactory->createFromArray(data: (array) $request->event);
+            $event->userId = $sessionObj->userId;
+            $newEvent = $eventService->createEvent(event: $event,images: $request->images, categories: $request->categories);
+            if(!$newEvent instanceof ResponseError){
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Création de l'evenement réussie", 'data' => ['newEvent' => $newEvent]]);
+            } else {
+                $error = $newEvent;
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
             }
-            break;
-        case 'updateEvent':
-            try{
-                $event = $eventFactory->createFromJson(json: $request->event);
-                $updateEvent = $eventService->updateEvent(event: $event);
-                if(!$updateEvent instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Modification de l'évenement réussie", 'data' => ['updateEvent' => $updateEvent]]);
-                } else {
-                    $error = $newFolder;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    case 'updateEvent':
+        try{
+            $event = $eventFactory->createFromJson(json: $request->event);
+            $updateEvent = $eventService->updateEvent(event: $event);
+            if(!$updateEvent instanceof ResponseError){
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Modification de l'évenement réussie", 'data' => ['updateEvent' => $updateEvent]]);
+            } else {
+                $error = $newFolder;
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
             }
-            break;
-        case 'getEventById':
-            try{
-                $event = $eventService->getEventById(id: $request->id);
-                if(!$event instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Event trouvé", 'data' => ['event' => $event]]);
-                } else {
-                    $error = $newFolder;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    case 'getEventById':
+        try{
+            $event = $eventService->getEventById(id: $request->id);
+            if(!$event instanceof ResponseError){
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Event trouvé", 'data' => ['event' => $event]]);
+            } else {
+                $error = $newFolder;
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
             }
-            break;
-        case'getEventsOfUser':
-            try{
-                $event = $eventService->getEventsOfUser(userId: $request->userId);
-                if(!$event instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Events trouver", 'data' => ['event' => $event]]);
-                } else {
-                    $error = $newFolder;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    case'getEventsOfUser':
+        try{
+            $session = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->session);
+            $sessionObj = $sessionFactory->createFromJson(json: $session);
+            $events = $eventService->getEventsOfUser(userId: $userId = $sessionObj->userId);
+            if(!$events instanceof ResponseError){
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Events trouver", 'data' => ['events' => $events]]);
+            } else {
+                $error = $newFolder;
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
             }
-            break;
-        case'getAllEvents':
-            try{
-                $events = $eventService->getAllEvents();
-                if(!$events instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Tous les evenements trouves", 'data' => ['events' => $events]]);
-                } else {
-                    $error = $newFolder;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    case'getAllEvents':
+        try{
+            $events = $eventService->getAllEvents();
+            if(!$events instanceof ResponseError){
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Tous les evenements trouves", 'data' => ['events' => $events]]);
+            } else {
+                $error = $newFolder;
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
             }
-            break;
-        case'searchEvent':
-            try{
-                $events = $eventService->search(search: $request->search);
-                if(!$events instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Evenements trouves", 'data' => ['events' => $events]]);
-                } else {
-                    $error = $newFolder;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    case'searchEvent':
+        try{
+            $events = $eventService->search(search: $request->search);
+            if(!$events instanceof ResponseError){
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Evenements trouves", 'data' => ['events' => $events]]);
+            } else {
+                $error = $newFolder;
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
             }
-            break;
-        case'deleteEvent':
-            try{
-                $event = $eventService->deleteEvent(id: $request->id);
-                if(!$event instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Event supprimé", 'data' => ['event' => $event]]);
-                } else {
-                    $error = $newFolder;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    case'deleteEvent':
+        try{
+            $event = $eventService->deleteEvent(id: $request->id);
+            if(!$event instanceof ResponseError){
+                $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Event supprimé", 'data' => ['event' => $event]]);
+            } else {
+                $error = $newFolder;
+                $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
             }
-            break;
-        default:
-            $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 2000, 'message' => "Le service demandé: " . $request->action . " n'existe pas"]);
-            break;
-    }
-    $device = $authorizedDeviceService->getAuthorizedDeviceById( deviceId: $session->deviceId);
-    $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $device->id);
-} else {
-    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Pas de session valable, l'utilisateur doit se reconnecter"]);
+        } catch (\Throwable $th) {
+            $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+        }
+        break;
+    default:
+        $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 2000, 'message' => "Le service demandé: " . $request->action . " n'existe pas"]);
+        break;
 }
 echo json_encode(value: $response);

@@ -63,6 +63,16 @@ class UserService
         }
     }
 
+    public function getAllUsers(): array|ResponseError
+    {
+        try{
+            $users = $this->userRepository->getAllUsers();
+            return $users;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
     public function search(string $search): array|ResponseError
     {
         try{

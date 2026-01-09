@@ -18,9 +18,6 @@ use App\Factories\ResponseFactory;
 use App\Factories\AuthorizedDeviceFactory;
 use App\Factories\LogsBadFactory;
 use App\Factories\EmailFactory;
-use App\Factories\TemplateFactory;
-use App\Factories\ImageToTemplateFactory;
-use App\Factories\CategoryFactory;
 use App\Factories\UserFactory;
 /**
  * Repositories
@@ -29,17 +26,12 @@ use App\Repositories\SessionRepository;
 use App\Repositories\AuthorizedDeviceRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\LogsBadRepository;
-use App\Repositories\TemplateRepository;
-use App\Repositories\ImageToTemplateRepository;
-use App\Repositories\CategoryRepository;
 /**
  * Validators
  */
 use App\Validators\SessionValidationService;
 use App\Validators\AuthorizedDeviceValidationService;
 use App\Validators\EmailValidationService;
-use App\Validators\TemplateValidationService;
-use App\Validators\CategoryValidationService;
 use App\Validators\UserValidationService;
 /**
  * Services
@@ -48,7 +40,6 @@ use App\Services\DBConnection;
 use App\Services\SessionService;
 use App\Services\AuthorizedDeviceService;
 use App\Services\EmailService;
-use App\Services\TemplateService;
 /**
  * Libraries
  */
@@ -63,9 +54,6 @@ $authorizedDeviceFactory = new AuthorizedDeviceFactory();
 $responseFactory = new ResponseFactory();
 $logsBadFactory = new LogsBadFactory();
 $emailFactory = new EmailFactory();
-$templateFactory = new TemplateFactory();
-$imageToTemplateFactory = new ImageToTemplateFactory();
-$categoryFactory = new CategoryFactory();
 $userFactory = new UserFactory();
 /**
  * Repositories
@@ -74,17 +62,12 @@ $sessionRepository = new SessionRepository(db: $db, tools: $tools, sessionFactor
 $authorizedDeviceRepository = new AuthorizedDeviceRepository(db: $db, tools: $tools, authorizedDeviceFactory: $authorizedDeviceFactory);
 $userRepository = new UserRepository(db: $db, tools: $tools, userFactory: $userFactory);
 $logsBadRepository = new LogsBadRepository(db: $db,tools: $tools,logsBadFactory: $logsBadFactory);
-$templateRepository = new TemplateRepository(db: $db, tools: $tools, templateFactory: $templateFactory);
-$imageToTemplateRepository = new ImageToTemplateRepository(db: $db, tools: $tools, imageToTemplateFactory: $imageToTemplateFactory);
-$categoryRepository = new CategoryRepository(db: $db, tools: $tools, categoryFactory: $categoryFactory);
 /**
  * Validators
  */
 $sessionValidationService = new SessionValidationService();
 $authorizedDeviceValidationService = new AuthorizedDeviceValidationService(tools: $tools,authorizedDeviceRepository: $authorizedDeviceRepository);
 $emailValidationService = new EmailValidationService();
-$templateValidationService = new TemplateValidationService();
-$categoryValidationService = new CategoryValidationService();
 $userValidationService = new UserValidationService(userRepository: $userRepository);
 /**
  * Services
@@ -115,55 +98,80 @@ $authorizedDeviceService = new AuthorizedDeviceService(
     userValidationService: $userValidationService,
     emailService: $emailService
 );
-$templateService = new TemplateService(
-    templateFactory: $templateFactory,
-    imageToTemplateFactory: $imageToTemplateFactory,
-    categoryFactory: $categoryFactory,
-    responseErrorFactory: $responseErrorFactory,
-    templateRepository: $templateRepository,
-    imageToTemplateRepository: $imageToTemplateRepository,
-    categoryRepository: $categoryRepository,
-    templateValidationService: $templateValidationService,
-    categoryValidationService: $categoryValidationService
-);
+
+/**
+ * Google API Key from .env
+ */
+$GOOGLE_API_KEY = $_ENV['GOOGLE_ADDRESS_VALIDATION_API_KEY'] ?? null;
+
+if (!$GOOGLE_API_KEY) {
+    $response = $responseFactory->createFromArray(data: [
+        'status' => 'error', 
+        'code' => 500, 
+        'message' => 'Configuration Google API manquante'
+    ]);
+    echo json_encode($response);
+    exit;
+}
 
 if ($sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
     $sessionString = $tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->session);
     $session = $sessionFactory->createFromJson(json: $sessionString);
+    
     switch($request->action){
-        case 'getAllTemplates':
-            try{
-                $templates = $templateService->getAllTemplates();
-                if(!$templates instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Tous les templates trouvés", 'data' => ['templates' => $templates]]);
+        case 'validateAddress':
+            try {
+                // Construire la requête Google
+                $addressData = [
+                    'address' => [
+                        'regionCode' => $request->regionCode ?? 'FR',
+                        'addressLines' => [$request->fullAddress]
+                    ]
+                ];
+                
+                // Appel à Google Address Validation API
+                $ch = curl_init("https://addressvalidation.googleapis.com/v1:validateAddress?key={$GOOGLE_API_KEY}");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($addressData));
+                
+                $result = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+                
+                if ($httpCode === 200) {
+                    $googleResponse = json_decode($result);
+                    
+                    $response = $responseFactory->createFromArray(data: [
+                        'status' => 'success', 
+                        'code' => null, 
+                        'message' => 'Validation effectuée avec succès', 
+                        'data' => ['validation' => $googleResponse]
+                    ]);
                 } else {
-                    $error = $templates;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                    $response = $responseFactory->createFromArray(data: [
+                        'status' => 'error', 
+                        'code' => $httpCode, 
+                        'message' => "Erreur lors de l'appel à Google API: " . ($curlError ?: 'Code HTTP ' . $httpCode)
+                    ]);
                 }
             } catch (\Throwable $th) {
                 $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
             }
             break;
-        case 'getTemplateById':
-            try{
-                $template = $templateService->getTemplateById(id: $request->id);
-                if(!$template instanceof ResponseError){
-                    $response = $responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Template trouvé", 'data' => ['template' => $template]]);
-                } else {
-                    $error = $template;
-                    $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
-                }
-            } catch (\Throwable $th) {
-                $tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
-            }
-            break;
+            
         default:
             $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 2000, 'message' => "Le service demandé: " . $request->action . " n'existe pas"]);
             break;
     }
-    $device = $authorizedDeviceService->getAuthorizedDeviceById( deviceId: $session->deviceId);
+    
+    // ✅ Mise à jour de la session et du authorized device
+    $device = $authorizedDeviceService->getAuthorizedDeviceById(deviceId: $session->deviceId);
     $authorizedDeviceService->refreshAuthorizedDevice(authorizedDeviceId: $device->id);
 } else {
     $response = $responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Pas de session valable, l'utilisateur doit se reconnecter"]);
 }
+
 echo json_encode(value: $response);

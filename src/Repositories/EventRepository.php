@@ -135,7 +135,7 @@ class EventRepository
             $stmt->bindParam(param: ':title', var: $event->title);
             $stmt->bindParam(param: ':description', var: $event->description);
             $stmt->bindParam(param: ':html', var:$event->html);
-            $stmt->bindParam(param: ':stret', var: $event->street);
+            $stmt->bindParam(param: ':street', var: $event->street);
             $stmt->bindParam(param: ':streetNumber', var: $event->streetNumber);
             $stmt->bindParam(param: ':zipCode', var: $event->zipCode);
             $stmt->bindParam(param: ':city', var: $event->city);
@@ -147,7 +147,7 @@ class EventRepository
             $stmt->bindParam(param: ':maxReservation', var: $event->maxReservation);
             $stmt->bindParam(param: ':price', var: $event->price);
             $stmt->bindParam(param: ':ageRestriction', var: $event->ageRestriction);
-            $stmt->bindParam(param: ':isOnline', var: $event->isOneline);
+            $stmt->bindParam(param: ':isOnline', var: $event->isOnline);
             $stmt->bindParam(param: ':isDeleted', var: $event->isDeleted);
             $stmt->execute();
             return $event;
@@ -224,9 +224,9 @@ class EventRepository
                 $columnsToUpdate[] = 'ageRestriction = :ageRestriction';
                 $parameters['ageRestriction'] = $event->ageRestriction;
             }
-            if($event->isOneline !== null){
-                $columnsToUpdate[] = 'isOneline = :isOneline';
-                $parameters['isOneline'] = $event->isOneline;
+            if($event->isOnline !== null){
+                $columnsToUpdate[] = 'isOnline = :isOnline';
+                $parameters['isOnline'] = $event->isOnline;
             }
             if($event->isDeleted !== null){
                 $columnsToUpdate[] = 'isDeleted = :isDeleted';

@@ -41,13 +41,9 @@ class EventValidationService
         if(empty($event->ageRestriction)){
             throw new \Exception(message:"Une restriction d'age est obligatoire",code: 5086);
         }
-        if(empty($event->isOneline)){
+        if(empty($event->isOnline)){
             throw new \Exception(message:"Un status de publication est obligatoire",code: 5087);
         }
         return true;
     }
-//     public function validateAddress(Event $event): bool
-//     {
-        // validation via l'API google maps
-//     }
 }

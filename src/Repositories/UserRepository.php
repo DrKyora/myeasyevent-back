@@ -219,10 +219,6 @@ class UserRepository
                 $columnsToUpdate[] = "validateDate = :validateDate";
                 $parameters[":validateDate"] = $user->validateDate;
             }
-            if ($user->isAdmin !== null) {
-                $columnsToUpdate[] = "isAdmin = :isAdmin";
-                $parameters[":isAdmin"] = $user->isAdmin;
-            }
             if ($user->isDeleted !== null) {
                 $columnsToUpdate[] = "isDeleted = :isDeleted";
                 $parameters[":isDeleted"] = $user->isDeleted;

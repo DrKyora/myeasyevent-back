@@ -79,7 +79,7 @@ class TemplateService
             $template = $this->templateRepository->getTemplateById(id: $id);
             $images[] = $this->imageToTemplateRepository->getThumbnailImage(templateId: $template->id);
             $categories[] = $this->categoryRepository->getCategoriesOfTemplate(templateId: $template->id);
-            $DTOTemplate = $this->templateFactory->createDynamic(template: $template,fields: ['id','title','description'],images: $images,categories: $categories);
+            $DTOTemplate = $this->templateFactory->createDynamic(template: $template,fields: ['id','title','html','description'],images: $images,categories: $categories);
             return $DTOTemplate;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);

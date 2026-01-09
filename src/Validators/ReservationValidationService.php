@@ -79,7 +79,7 @@ class ReservationValidationService
 
     public function ageIsPresent(Reservation $reservation): bool
     {
-        if (empty($reservation->age)) {
+        if (empty($reservation->birthDate)) {
             throw new \Exception(message: "Veuillez renseigner votre age", code: 5304);
         }
         return true;

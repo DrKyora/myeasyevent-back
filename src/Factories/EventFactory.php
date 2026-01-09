@@ -27,7 +27,7 @@ class EventFactory
             maxReservation: $data["maxReservation"] ?? null,
             price: $data["price"] ?? null,
             ageRestriction: $data["ageRestriction"] ?? null,
-            isOneline: $data["isOneline"] ?? false,
+            isOnline: $data["isOnline"] ?? true,
             isDeleted: $data["isDeleted"] ?? false
         );
     }

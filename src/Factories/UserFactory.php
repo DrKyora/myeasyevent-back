@@ -3,6 +3,7 @@
 namespace App\Factories;
 
 use App\Models\User;
+use App\DTOModels\DTOUser;
 
 class UserFactory
 {
@@ -27,5 +28,18 @@ class UserFactory
             throw new \Exception(message: "Invalid JSON format");
         }
         return $this->createFromArray(data: $data);
+    }
+
+    public function createDynamic(User $user, array $fields): DTOUser
+    {
+        $filteredData = array_intersect_key((array) $user,array_flip($fields));
+        return new DTOUser(
+            id: $filteredData['id'] ?? null,
+            lastName: $filteredData['lastName'] ?? null,
+            firstName: $filteredData['firstName'] ?? null,
+            email: $filteredData['email'] ?? null,
+            validateDate: $filteredData['validateDate'] ?? null,
+            isAdmin: $filteredData['isAdmin'] ?? null
+        );
     }
 }
