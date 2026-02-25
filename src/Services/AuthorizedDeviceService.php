@@ -81,6 +81,27 @@ class AuthorizedDeviceService
         }
     }
 
+    public function tokenDeviceObject(string $token): AuthorizedDevice|ResponseError
+    {
+        try{
+            $jsonDevice = $this->tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $token);
+            $device = $this->authorizedDeviceFactory->createFromJson(json: $jsonDevice);
+            return $device;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function getDevicesOfUser(string $userId): array|ResponseError
+    {
+        try{
+            $devices = $this->authorizedDeviceRepository->getDeviceOfUser(userId: $userId);
+            return $devices;
+        }catch(\Exception $e){
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
     public function registerNewAuthorizedDevice(string $userId): AuthorizedDevice|ResponseError
     {
         try{
@@ -88,7 +109,7 @@ class AuthorizedDeviceService
             switch(true){
                 case (preg_match(pattern: '/Windows/i', subject: $user_agent)):
                     $defaultName = 'Ordinateur';
-                    $os = 'Windowws';
+                    $os = 'Windows';
                     break;
                 case (preg_match(pattern: '/Android/i', subject: $user_agent)):
                     $defaultName = 'Smartphone-tablette';

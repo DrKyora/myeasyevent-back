@@ -47,7 +47,7 @@ class AuthorizedDeviceRepository
         }
     }
 
-    public function getAuthorizedDeviceOfUser(string $userId): array
+    public function getDeviceOfUser(string $userId): array
     {
         try{
             $query = "SELECT * FROM authorized_devices WHERE userid = :userId AND isDeleted = 0";
