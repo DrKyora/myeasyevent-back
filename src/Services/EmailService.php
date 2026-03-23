@@ -126,7 +126,7 @@ class EmailService
             foreach($contentsEmails as $key => $value){
                 $contentMail = str_replace(search: "$key", replace: $value, subject: $contentMail);
             }
-            $contentMail = str_replace(search: "{{FrontEndAddress}}", replace: $_ENV['FRONTEND_ADDRESS'], subject: $contentMail);
+            $contentMail = str_replace(search: "{{FrontEndAddress}}", replace: $_ENV['FRONT_END_URL'], subject: $contentMail);
             $email->content = $contentMail;
             return $email;
         }catch(\Exception $e){
