@@ -39,7 +39,8 @@ class UserFactory
             firstName: $filteredData['firstName'] ?? null,
             email: $filteredData['email'] ?? null,
             validateDate: $filteredData['validateDate'] ?? null,
-            isAdmin: $filteredData['isAdmin'] ?? null
+            isAdmin: $filteredData['isAdmin'] ?? null,
+            isDeleted: $filteredData['isDeleted'] ?? null
         );
     }
 }

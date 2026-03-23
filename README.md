@@ -33,6 +33,7 @@ user| 5000 - 5049
 5025| Cet utilisateur n'existe pas 
 5026| Trop de tentatives de connexion, compte bloque 5 minutes
 5027| IP ou utilisateur bloque
+5028| Utilisateur non admin
 ||
 template| 5050 - 5079
 ||

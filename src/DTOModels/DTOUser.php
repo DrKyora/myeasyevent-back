@@ -10,6 +10,7 @@ class DTOUser
     public readonly ?string $email;
     public readonly ?string $validateDate;
     public readonly ?bool $isAdmin;
+    public readonly ?bool $isDeleted;
 
     public function __construct(
         ?string $id,
@@ -17,7 +18,8 @@ class DTOUser
         ?string $firstName,
         ?string $email,
         ?string $validateDate,
-        ?bool $isAdmin
+        ?bool $isAdmin,
+        ?bool $isDeleted
     ){
         $this->id = $id;
         $this->lastName = $lastName;
@@ -25,5 +27,6 @@ class DTOUser
         $this->email = $email;
         $this->validateDate = $validateDate;
         $this->isAdmin = $isAdmin;
+        $this->isDeleted = $isDeleted;
     }
 }

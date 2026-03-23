@@ -162,6 +162,16 @@ class UserService
         }
     }
 
+    public function userIsAdmin($userId): bool| ResponseError
+    {
+        try{
+            $user = $this->userRepository->isAdmin($userId);
+            return $user;
+        }catch(\Exception $e){
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
     public function updateUser(User $user): bool|ResponseError
     {
         try{
