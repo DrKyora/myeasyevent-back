@@ -58,6 +58,64 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
                     $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
                 }
                 break;
+            case'updateUserRole':
+                try{
+                    $user = $dependances->userService->getUser(key: 'id', value: $request->userId);
+                    $user->isAdmin = $request->isAdmin;
+                    $response = $dependances->userService->updateUser(user: $user);
+                    if(!$response instanceof ResponseError){
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Mise à jour du role de l'utilisateur réussie"]);
+                    } else {
+                        $error = $response;
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                    }
+                } catch (\Exception $e) {
+                    $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
+                }
+                break;
+            case'blacklistUser':
+                try{
+                    $user = $dependances->userService->getUser(key:'id', value: $request->userId);
+                    $bannedDate = new DateTime();
+                    $bannedDate->format(format: 'Y-m-d H:i:s');
+                    $bannedUser = $dependances->blacklistUserFactory->createFromArray(['userId' => $user->id, 'bannedDate' => $bannedDate]);
+                    $response = $dependances->blacklistUserService->addBlacklistUser(blacklistUser: $bannedUser);
+                    if(!$response instanceof ResponseError){
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "L'utilisateur a été banni avec succès"]);
+                    } else {
+                        $error = $response;
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                    }
+                } catch (\Exception $e) {
+                    $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
+                }
+                break;
+            case'unBlacklistUser':
+                try{
+                    $response = $dependances->blacklistUserService->unBlacklistUser($request->userId);
+                    if(!$response instanceof ResponseError){
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "L'utilisateur a été débanni avec succès"]);
+                    } else {
+                        $error = $response;
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                    }
+                } catch (\Exception $e) {
+                    $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
+                }
+                break;
+            case'deleteUser':
+                try{
+                    $response = $dependances->userService->deleteUser(userId:$request->userId);
+                    if(!$response instanceof ResponseError){
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "L'utilisateur a été supprimé avec succès"]);
+                    } else {
+                        $error = $response;
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                    }
+
+                } catch (\Exception $e) {
+                    $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
+                }
         }
     } else {
         $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5028, 'message' => "L'utilisateur n'est pas administrateur"]);

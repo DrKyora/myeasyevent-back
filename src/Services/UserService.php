@@ -194,10 +194,10 @@ class UserService
         }
     }
 
-    public function DeleteUser(string $id): bool|ResponseError
+    public function DeleteUser(string $userId): bool|ResponseError
     {
         try{
-            $user = $this->userRepository->getUserById( id: $id);
+            $user = $this->userRepository->getUserById(id: $userId);
             if($user){
                 $user->isDeleted = true;
                 $this->userRepository->updateUser(user: $user);

@@ -26,7 +26,7 @@ class BlacklistUserRepository
         $this->blacklistUserFactory = $blacklistUserFactory;
     }
 
-    public function getBlacklistUsers(): array
+    public function getAllBlacklistUsers(): array
     {
         try{
             $query = "SELECT * FROM blacklist_users";

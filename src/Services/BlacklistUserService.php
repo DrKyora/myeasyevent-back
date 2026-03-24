@@ -33,11 +33,11 @@ class BlacklistUserService
         $this->blacklistUserValidationService = $blacklistUserValidationService;
     }
 
-    public function getBlacklistUsers(): array|ResponseError
+    public function getAllBlacklistUsers(): array|ResponseError
     {
         try{
-            $blacklistUser = $this->blacklistUserRepository->getBlacklistUsers();
-            return $blacklistUser;
+            $blacklistUsers = $this->blacklistUserRepository->getAllBlacklistUsers();
+            return $blacklistUsers;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
@@ -54,10 +54,14 @@ class BlacklistUserService
         }
     }
 
-    public function unBlacklistUser(BlacklistUser $blacklistUser): bool|ResponseError
+    public function unBlacklistUser(string $userId): bool|ResponseError
     {
         try{
-            $this->blacklistUserRepository->deleteBlacklistUser(blacklistUser: $blacklistUser);
+            $foundBlacklistUser = $this->blacklistUserRepository->getBlacklistUsersByUserId(userId: $userId);
+            if($foundBlacklistUser instanceof ResponseError) {
+                return $foundBlacklistUser;
+            }
+            $this->blacklistUserRepository->deleteBlacklistUser(blacklistUser: $foundBlacklistUser);
             return true;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
