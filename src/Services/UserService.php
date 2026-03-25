@@ -194,14 +194,30 @@ class UserService
         }
     }
 
-    public function DeleteUser(string $userId): bool|ResponseError
+    public function desactivateUser(string $userId): bool|ResponseError|null
     {
         try{
             $user = $this->userRepository->getUserById(id: $userId);
-            if($user){
-                $user->isDeleted = true;
-                $this->userRepository->updateUser(user: $user);
+            if(!$user instanceof User){
+                return null;
             }
+            $user->isDeleted = true;
+            $this->userRepository->updateUser(user: $user);
+            return true;
+        } catch (\Exception $e) {
+            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function reactivateUser(string $userId): bool|ResponseError|null
+    {
+        try{
+            $user = $this->userRepository->getUserById(id: $userId);
+            if(!$user instanceof User){
+                return null;
+            }
+            $user->isDeleted = false;
+            $this->userRepository->updateUser(user: $user);
             return true;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);

@@ -15,7 +15,8 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
     $session = $dependances->sessionFactory->createFromJson(json: $sessionString);
     $user = $dependances->userService->userIsAdmin($session->userId);
     if(!$user instanceof ResponseError){
-        switch($request->action){
+        if($user === true){
+            switch($request->action){
             case'getAllUsers':
                 try{
                     $userFull = $dependances->userService->getAllUsers();
@@ -103,22 +104,38 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
                     $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
                 }
                 break;
-            case'deleteUser':
+            case'desactivateUser':
                 try{
-                    $response = $dependances->userService->deleteUser(userId:$request->userId);
+                    $response = $dependances->userService->desactivateUser(userId:$request->userId);
                     if(!$response instanceof ResponseError){
-                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "L'utilisateur a été supprimé avec succès"]);
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "L'utilisateur a été désactivé avec succès"]);
                     } else {
                         $error = $response;
                         $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
                     }
-
                 } catch (\Exception $e) {
                     $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
                 }
+                break;
+            case'reactivateUser':
+                try{
+                    $response = $dependances->userService->reactivateUser(userId:$request->userId);
+                    if(!$response instanceof ResponseError){
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "L'utilisateur a été réactivé avec succès"]);
+                    } else {
+                        $error = $response;
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                    }
+                } catch (\Exception $e) {
+                    $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
+                }
+                break;
+            }
+        } else {
+            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5028, 'message' => "L'utilisateur n'est pas administrateur"]);
         }
     } else {
-        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5028, 'message' => "L'utilisateur n'est pas administrateur"]);
+    $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $user->code, 'message' => $user->message]);
     }
 } else {
     $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Pas de session valable, l'utilisateur doit se reconnecter"]);

@@ -15,7 +15,9 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
     $session = $dependances->sessionFactory->createFromJson(json: $sessionString);
     $user = $dependances->userService->userIsAdmin($session->userId);
     if(!$user instanceof ResponseError){
-        switch($request->action){
+        if($user === true){
+            switch($request->action){
+
 
 
 
@@ -23,8 +25,11 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
 
 
                 }
+        } else {
+            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5028, 'message' => "L'utilisateur n'est pas administrateur"]);
+        }
     } else {
-        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5028, 'message' => "L'utilisateur n'est pas administrateur"]);
+    $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $user->code, 'message' => $user->message]);
     }
 } else {
     $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Pas de session valable, l'utilisateur doit se reconnecter"]);
