@@ -20,11 +20,16 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
             case'getAllUsers':
                 try{
                     $userFull = $dependances->userService->getAllUsers();
-                    $filterdUsers = [];
+                    if(!$userFull instanceof ResponseError){
+                        $filterdUsers = [];
                     foreach ($userFull as $user) {
                         $filterdUsers[] = $dependances->userFactory->createDynamic(user: $user, fields: ['id','lastName', 'firstName', 'email', 'validateDate', 'isAdmin', 'isDeleted']);
                     }
                     $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Utilisateurs récupérés avec succès", 'data' =>['users'  => $filterdUsers]]);
+                    } else {
+                        $error = $userFull;
+                        $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                    }
                 } catch (\Exception $e) {
                     $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
                 }

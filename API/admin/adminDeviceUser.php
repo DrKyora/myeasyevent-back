@@ -17,14 +17,36 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
     if(!$user instanceof ResponseError){
         if($user === true){
             switch($request->action){
-
-
-
-
-
-
-
-                }
+                case'getDeviceOfUser':
+                    try{
+                        $devices = $dependances->authorizedDeviceService->getDevicesOfUser(userId: $request->userId);
+                        if(!$devices instanceof ResponseError){
+                            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Appareils de l'utilisateur récupérés avec succès", 'data' =>['devices'  => $devices]]);
+                        } else {
+                            $error = $devices;
+                            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                        }
+                    } catch (\Throwable $th) {
+                        $dependances->tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+                    }
+                    break;
+                case 'deleteDeviceOfUser':
+                    try{
+                        $reponse = $dependances->authorizedDeviceService->deleteAuthorizedDevice(id: $request->deviceId);
+                        if(!$reponse instanceof ResponseError){
+                            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Suppression de l'appareil réussie"]);
+                        } else {
+                            $error = $reponse;
+                            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                        }
+                    } catch (\Throwable $th) {
+                        $dependances->tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+                    }
+                    break;
+                default:
+                $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 2000, 'message' => "Le service demandé: " . $request->action . " n'existe pas"]);
+                break;
+            }
         } else {
             $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5028, 'message' => "L'utilisateur n'est pas administrateur"]);
         }
