@@ -19,6 +19,8 @@ use App\Repositories\ReservationRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\CategoryRepository;
 
+use App\Services\ImageService;
+
 use App\Responses\ResponseError;
 
 use App\Validators\EventValidationService;
@@ -34,6 +36,7 @@ class EventService
     private EventFactory $eventFactory;
     private CategoryFactory $categoryFactory;
     private ImageToEventFactory $imageToEventFactory;
+    private ImageService $imageService;
     private ResponseErrorFactory $responseErrorFactory;
     public function __construct(
         EventRepository $eventRepository,
@@ -45,6 +48,7 @@ class EventService
         EventFactory $eventFactory,
         CategoryFactory $categoryFactory,
         ImageToEventFactory $imageToEventFactory,
+        ImageService $imageService,
         ResponseErrorFactory $responseErrorFactory
     ){
         $this->eventRepository = $eventRepository;
@@ -56,6 +60,7 @@ class EventService
         $this->eventFactory = $eventFactory;
         $this->categoryFactory = $categoryFactory;
         $this->imageToEventFactory = $imageToEventFactory;
+        $this->imageService = $imageService;
         $this->responseErrorFactory = $responseErrorFactory;
     }
 
@@ -98,7 +103,8 @@ class EventService
                     $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
                     $arrayReservations[] = $arrayReservation;
                 }
-                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations);
+                $imagesOfEvent = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations,images: $imagesOfEvent);
             }
             return $arrayDTOEvent;
         } catch (\Exception $e) {
@@ -116,12 +122,13 @@ class EventService
                 $userName = "{$user->firstName} {$user->lastName}";
                 $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
                 $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
-                $arrayReservations = []; // ⬅️ Sortir de la boucle foreach($reservations)
+                $arrayReservations = [];
                 foreach($reservations as $reservation){
                     $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
                     $arrayReservations[] = $arrayReservation;
                 }
-                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations);
+                $imagesOfEvent = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations,images: $imagesOfEvent);
             }
             return $arrayDTOEvent;
         } catch (\Exception $e) {
@@ -145,7 +152,8 @@ class EventService
                     $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
                     $arrayReservations[] = $arrayReservation;
                 }
-                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations);
+                $imagesOfEvent = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations,images: $imagesOfEvent);
             }
             return $arrayDTOEvent;
         } catch (\Exception $e) {
@@ -153,21 +161,27 @@ class EventService
         }
     }
 
-    public function createEvent(Event $event, array $images, array $categories): Event|ResponseError
+    public function createEvent(Event $event, array $images, array $categories): bool|ResponseError
     {
         try{
             $this->eventValidationService->validate(event: $event);
             $newEvent = $this->eventRepository->addEvent(event: $event);
             foreach($images as $image){
-                $newImage =$this->imageToEventFactory->createFromArray(data: ['eventId' => $newEvent->id,'fileName' => $image]);
-                $this->imageToEventRepository->addImageToEvent(imageToEvent: $newImage);
+                $imageName = $event->id . '_' . random_int(min: 100000,max: 999999);
+                $uploadResult = $this->imageService->resizeImage(base64: $image, fileName: $imageName, targetPath: __DIR__ . '/../../img/events/');
+                if($uploadResult instanceof ResponseError){
+                    return $uploadResult;
+                }
+                $imageToEvent = $this->imageToEventFactory->createFromArray(data: ['eventId' => $event->id,'fileName' => $imageName]);
+                $this->imageToEventRepository->addImageToEvent(imageToEvent: $imageToEvent);
+                $images[] = $imageName;
             }
             foreach($categories as $category){
                 $Category = $this->categoryFactory->createFromArray(data: ['eventId' => $newEvent->id,'name' => $category]);
                 $newCategory = $this->categoryRepository->addCategory(category: $Category);
                 $this->categoryRepository->addCategoryToEvent(eventId: $newCategory->id,categoryId: $event->id);
             }
-            return $newEvent;
+            return true;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
