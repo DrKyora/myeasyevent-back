@@ -2,7 +2,7 @@
 
 namespace App\Validators;
 
-class ImageValidator
+class ImageValidationService
 {
     private int $maxSize;
 

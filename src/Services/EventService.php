@@ -2,10 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Category;
 use App\Models\Event;
-use App\Models\ImageToEvent;
-use App\Models\Reservation;
 use App\DTOModels\DTOEvent;
 
 use App\Factories\ResponseErrorFactory;
@@ -116,7 +113,7 @@ class EventService
     {
         try{
             $events = $this->eventRepository->getAllEvents();
-            $arrayDTOEvent = []; // ⬅️ Sortir de la boucle foreach($events)
+            $arrayDTOEvent = [];
             foreach($events as $event){
                 $user = $this->userRepository->getUserById(id: $event->userId);
                 $userName = "{$user->firstName} {$user->lastName}";

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Factories\ResponseErrorFactory;
 
-use App\Validators\ImageValidator;
+use App\Validators\ImageValidationService;
 
 use App\Responses\ResponseError;
 
@@ -15,7 +15,7 @@ class ImageService
 
     public function __construct(
         ResponseErrorFactory $responseErrorFactory,
-        ImageValidator $imageValidator
+        ImageValidationService $imageValidator
     )
     {
         $this->responseErrorFactory = $responseErrorFactory;

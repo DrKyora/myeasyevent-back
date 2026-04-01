@@ -47,6 +47,7 @@ use App\Validators\BlacklistIpValidationService;
 use App\Validators\ReservationValidationService;
 use App\Validators\TemplateValidationService;
 use App\Validators\CategoryValidationService;
+use App\Validators\ImageValidationService;
 
 class DépendancesContainer {
     public DBConnection $db;
@@ -95,6 +96,7 @@ class DépendancesContainer {
     public ReservationValidationService $reservationValidationService;
     public TemplateValidationService $templateValidationService;
     public CategoryValidationService $categoryValidationService;
+    public ImageValidationService $imageValidationService;
 
     // Services
     public SessionService $sessionService;
@@ -107,6 +109,8 @@ class DépendancesContainer {
     public LogsBadService $logsBadService;
     public BlacklistUserService $blacklistUserService;
     public BlacklistIpService $blacklistIpService;
+
+    public ImageService $imageService;
 
     public function __construct() {
         // === LIBRARIES ===
@@ -156,8 +160,14 @@ class DépendancesContainer {
         $this->reservationValidationService = new ReservationValidationService(tools: $this->tools, reservationRepository: $this->reservationRepository);
         $this->templateValidationService = new TemplateValidationService();
         $this->categoryValidationService = new CategoryValidationService();
+        $this->imageValidationService = new ImageValidationService();
 
         // === SERVICES ===
+        $this->imageService = new ImageService(
+            $this->responseErrorFactory,
+            $this->imageValidationService
+        );
+
         $this->emailService = new EmailService(
             tools: $this->tools,
             emailFactory: $this->emailFactory,
@@ -197,7 +207,8 @@ class DépendancesContainer {
             eventFactory: $this->eventFactory,
             categoryFactory: $this->categoryFactory,
             imageToEventFactory: $this->imageToEventFactory,
-            responseErrorFactory: $this->responseErrorFactory
+            responseErrorFactory: $this->responseErrorFactory,
+            imageService: $this->imageService
         );
         
         $this->userService = new UserService(
