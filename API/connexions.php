@@ -108,6 +108,6 @@ switch($request->action) {
         break;
 }
 if (!isset($response)) {
-    $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $th->getCode(), 'message' => $th->getMessage()]);
+    $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 500, 'message' => 'Une erreur est survenue']);
 }
 echo json_encode(value: $response);
