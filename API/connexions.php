@@ -6,8 +6,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use App\Responses\ResponseError;
 
 $request = json_decode(json: file_get_contents(filename: 'php://input'));
-
-// ✅ Une seule ligne: le conteneur
 $dependances = new \App\Services\DépendancesContainer();
 
 switch($request->action) {
@@ -45,9 +43,7 @@ switch($request->action) {
         $string = $dependances->tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->token);
         if($device = $dependances->authorizedDeviceFactory->createFromString(string: $string)){
             if($dependances->authorizedDeviceService->authorizedDeviceExist(authorizedDeviceId: $device->id)){
-                // 🔥 CORRECTION : Récupérer le device depuis la BDD pour avoir validateDate à jour
                 $deviceFromDB = $dependances->authorizedDeviceService->getAuthorizedDeviceById(deviceId: $device->id);
-                
                 if($dependances->authorizedDeviceService->authorizedDeviceIsValidate(authorizedDevice: $deviceFromDB)){
                     $dependances->sessionService->deleteSessionDevice(id: $deviceFromDB->id);
                     $lastAction = (new \DateTime())->format(format: 'Y-m-d H:i:s');
