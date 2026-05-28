@@ -17,7 +17,7 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
     if(!$user instanceof ResponseError){
         if($user === true){
             switch($request->action){
-
+                case'getAllStats':
 
 
 
