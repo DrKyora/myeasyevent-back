@@ -1,6 +1,5 @@
 <?php
-
-ini_set(option: 'display_errors', value: 1);
+$response = null;
 
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config.php';
