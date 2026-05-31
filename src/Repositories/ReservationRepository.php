@@ -67,7 +67,7 @@ class ReservationRepository
         }
     }
 
-    public function reservationExist(string $emailToVerif, string $excludedId = null): bool
+    public function reservationExist(string $emailToVerif, ?string $excludedId = null): bool
     {
         try{
             if($excludedId !== null){

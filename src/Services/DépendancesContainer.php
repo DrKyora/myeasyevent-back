@@ -34,6 +34,7 @@ use App\Repositories\TemplateRepository;
 use App\Repositories\ImageToTemplateRepository;
 use App\Repositories\BlacklistUserRepository;
 use App\Repositories\BlacklistIpRepository;
+use App\Repositories\StatsRepository;
 
 // Validators
 use App\Validators\SessionValidationService;
@@ -83,7 +84,7 @@ class DépendancesContainer {
     public ImageToTemplateRepository $imageToTemplateRepository;
     public BlacklistUserRepository $blacklistUserRepository;
     public BlacklistIpRepository $blacklistIpRepository;
-
+    public StatsRepository $statsRepository;
     // Validators
     public SessionValidationService $sessionValidationService;
     public AuthorizedDeviceValidationService $authorizedDeviceValidationService;
@@ -111,6 +112,7 @@ class DépendancesContainer {
     public BlacklistIpService $blacklistIpService;
 
     public ImageService $imageService;
+    public StatsService $statsService;
 
     public function __construct() {
         // === LIBRARIES ===
@@ -147,7 +149,7 @@ class DépendancesContainer {
         $this->imageToTemplateRepository = new ImageToTemplateRepository(db: $this->db, tools: $this->tools, imageToTemplateFactory: $this->imageToTemplateFactory);
         $this->blacklistUserRepository = new BlacklistUserRepository(db: $this->db, tools: $this->tools, blacklistUserFactory: $this->blacklistUserFactory);
         $this->blacklistIpRepository = new BlacklistIpRepository(db: $this->db, tools: $this->tools, blacklistIpFactory: $this->blacklistIpFactory);
-
+        $this->statsRepository = new StatsRepository(db: $this->db, tools: $this->tools);
         // === VALIDATORS ===
         $this->sessionValidationService = new SessionValidationService();
         $this->authorizedDeviceValidationService = new AuthorizedDeviceValidationService(tools: $this->tools, authorizedDeviceRepository: $this->authorizedDeviceRepository);
@@ -264,6 +266,12 @@ class DépendancesContainer {
             responseErrorFactory: $this->responseErrorFactory,
             blacklistIpRepository: $this->blacklistIpRepository,
             blacklistIpValidationService: $this->blacklistIpValidationService
+        );
+
+        $this->statsService = new StatsService(
+            tools: $this->tools,
+            statsRepository: $this->statsRepository,
+            responseErrorFactory: $this->responseErrorFactory
         );
     }
 }
