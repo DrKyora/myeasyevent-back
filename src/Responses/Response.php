@@ -16,7 +16,7 @@ class Response
     public ?int $code = 0;
     public ?string $message = null;
     public ?array $data = [];
-    public function __construct(string $status = null, ?int $code = 0, string $message = null, array $data = null)
+    public function __construct(?string $status = null, ?int $code = 0, ?string $message = null, ?array $data = null)
     {
         $this->status = $status;
         $this->code = $code;

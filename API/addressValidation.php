@@ -5,7 +5,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use App\Responses\ResponseError;
 
-$request = json_decode(json: file_get_contents(filename: 'php://input'));
+$request = json_decode(json: file_get_contents(filename: 'php://input'), associative: true);
 
 $dependances = new \App\Services\DépendancesContainer();
 
@@ -21,17 +21,17 @@ if (!$GOOGLE_API_KEY) {
     exit;
 }
 
-if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
-    $sessionString = $dependances->tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->session);
+if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request['session'])) {
+    $sessionString = $dependances->tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request['session']);
     $session = $dependances->sessionFactory->createFromJson(json: $sessionString);
     
-    switch($request->action){
+    switch($request['action']){
         case 'validateAddress':
             try {
                 $addressData = [
                     'address' => [
-                        'regionCode' => $request->regionCode ?? 'FR',
-                        'addressLines' => [$request->fullAddress]
+                        'regionCode' => $request['regionCode'] ?? 'FR',
+                        'addressLines' => [$request['fullAddress']]
                     ]
                 ];
                 
@@ -47,7 +47,7 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
                 curl_close($ch);
                 
                 if ($httpCode === 200) {
-                    $googleResponse = json_decode($result);
+                    $googleResponse = json_decode($result, associative: true);
                     $response = $dependances->responseFactory->createFromArray(data: [
                         'status' => 'success', 
                         'code' => null, 

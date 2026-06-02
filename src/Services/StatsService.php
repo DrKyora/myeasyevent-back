@@ -23,28 +23,17 @@ class StatsService
         $this->responseErrorFactory = $responseErrorFactory;
     }
 
-    public function countNumberOfUsers(): int|ResponseError
+    public function getAllStats(): array|ResponseError
     {
-        try {
-            return $this->statsRepository->countNumberOfUsers();
-        } catch (\Exception $e) {
-            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
-        }
-    }
-
-    public function countReservations(): int|ResponseError
-    {
-        try {
-            return $this->statsRepository->countReservations();
-        } catch (\Exception $e) {
-            return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
-        }
-    }
-
-    public function countEvents(): int|ResponseError
-    {
-        try {
-            return $this->statsRepository->countEvents();
+        try{
+            $allSats = [];
+            $numberOfUsers = $this->statsRepository->countNumberOfUsers();
+            $numberOfReservations = $this->statsRepository->countReservations();
+            $numberOfEvents = $this->statsRepository->countEvents();
+            $allSats['numberOfUsers'] = $numberOfUsers;
+            $allSats['numberOfReservations'] = $numberOfReservations;
+            $allSats['numberOfEvents'] = $numberOfEvents;
+            return $allSats;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }

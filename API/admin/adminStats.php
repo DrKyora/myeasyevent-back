@@ -18,12 +18,17 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
         if($user === true){
             switch($request->action){
                 case'getAllStats':
-                    
-
-
-
-
-
+                    try{
+                        $stats = $dependances->statsService->getAllStats();
+                        if(!$stats instanceof ResponseError){
+                            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Statistiques récupérées avec succès", 'data' =>['stats'  => $stats]]);
+                        } else {
+                            $error = $stats;
+                            $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                        }
+                    } catch (\Exception $e) {
+                        $dependances->tools->myErrorHandler(errno: $e->getCode(), errstr: $e->getMessage(), errfile: $e->getFile(), errline: $e->getLine());
+                    }
                 }
         } else {
             $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5028, 'message' => "L'utilisateur n'est pas administrateur"]);
