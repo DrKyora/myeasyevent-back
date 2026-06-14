@@ -70,7 +70,7 @@ class EventService
             $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
             $images = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
             $categories = $this->categoryRepository->getCategoriesOfEvent(eventId: $event->id);
-            $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
+            $arrayAddress = ['street' => $event->street, 'streetNumber' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
             $arrayReservations = [];
                 foreach($reservations as $reservation){
                     $arrayReservation = [];
@@ -92,7 +92,7 @@ class EventService
             $userName = "{$user->firstName} {$user->lastName}";
             $arrayDTOEvent = [];
             foreach($events as $event){
-                $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
+                $arrayAddress = ['street' => $event->street, 'streetNumber' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
                 $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
                 $arrayReservations = [];
                 foreach($reservations as $reservation){
@@ -117,7 +117,7 @@ class EventService
             foreach($events as $event){
                 $user = $this->userRepository->getUserById(id: $event->userId);
                 $userName = "{$user->firstName} {$user->lastName}";
-                $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
+                $arrayAddress = ['street' => $event->street, 'streetNumber' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
                 $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
                 $arrayReservations = [];
                 foreach($reservations as $reservation){
@@ -141,7 +141,7 @@ class EventService
                 $user = $this->userRepository->getUserById(id: $event->userId);
                 $userName = "{$user->firstName} {$user->lastName}";
                 $arrayDTOEvent = [];
-                $arrayAddress = ['street' => $event->street, 'streetNumer' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
+                $arrayAddress = ['street' => $event->street, 'streetNumber' => $event->streetNumber, 'zipCode' => $event->zipCode, 'city' => $event->city, 'country' => $event->country];
                 $reservations = $this->reservationRepository->getResevationsOfEvent(eventId: $event->id);
                 foreach($reservations as $reservation){
                     $arrayReservations = [];
