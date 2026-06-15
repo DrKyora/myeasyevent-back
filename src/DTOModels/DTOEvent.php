@@ -18,7 +18,7 @@ class DTOEvent
     public readonly ?int $maxReservation;
     public readonly ?int $price;
     public readonly ?string $ageRestriction;
-    public readonly ?array $reservation;
+    public readonly ?array $reservations;
     public readonly ?array $user;
     public readonly ?array $categories;
     public readonly ?array $images;
@@ -37,7 +37,7 @@ class DTOEvent
         ?int $maxReservation,
         ?int $price,
         ?string $ageRestriction,
-        ?array $reservation,
+        ?array $reservations,
         ?array $user,
         ?array $categories,
         ?array $images
@@ -55,7 +55,7 @@ class DTOEvent
         $this->maxReservation = $maxReservation;
         $this->price = $price;
         $this->ageRestriction = $ageRestriction;
-        $this->reservation = $reservation;
+        $this->reservations = $reservations;
         $this->user = $user;
         $this->categories = $categories;
         $this->images = $images;

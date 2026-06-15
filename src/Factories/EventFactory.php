@@ -41,7 +41,7 @@ class EventFactory
         return $this->createFromArray(data: $data);
     }
 
-    public function createDynamic(Event $event, array $fields,?string $userName = null, ?array $address = null, ?array $reservation = null, ?array $user = null, ?array $categories = null, ?array $images = null): DTOEvent
+    public function createDynamic(Event $event, array $fields,?string $userName = null, ?array $address = null, ?array $reservations = null, ?array $user = null, ?array $categories = null, ?array $images = null): DTOEvent
     {
         $filteredData = array_intersect_key((array) $event,array_flip($fields));
         return new DTOEvent(
@@ -58,7 +58,7 @@ class EventFactory
             maxReservation: $filteredData['maxReservation'] ?? null,
             price: $filteredData['price'] ?? null,
             ageRestriction: $filteredData['ageRestriction'],
-            reservation: $reservation,
+            reservations: $reservations,
             user: $user,
             categories: $categories,
             images: $images

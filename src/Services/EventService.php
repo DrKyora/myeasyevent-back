@@ -77,7 +77,7 @@ class EventService
                     $arrayReservation = ['lastName' => $reservation->lastName,'firstName' =>$reservation->firstName,'dateReservation' => $reservation->dateReservation];
                     $arrayReservations[] = $arrayReservation;
                 }
-                $DTOEvent = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','html','endDate','maxReservation','ageRestriction','price'],address: $arrayAddress,reservation: $arrayReservations,images: $images,categories: $categories,userName: $userName);
+                $DTOEvent = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','html','endDate','maxReservation','ageRestriction','price'],address: $arrayAddress,reservations: $arrayReservations,images: $images,categories: $categories,userName: $userName);
             return $DTOEvent;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);
@@ -101,7 +101,7 @@ class EventService
                     $arrayReservations[] = $arrayReservation;
                 }
                 $imagesOfEvent = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
-                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations,images: $imagesOfEvent);
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservations: $arrayReservations,images: $imagesOfEvent);
             }
             return $arrayDTOEvent;
         } catch (\Exception $e) {
@@ -125,7 +125,7 @@ class EventService
                     $arrayReservations[] = $arrayReservation;
                 }
                 $imagesOfEvent = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
-                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations,images: $imagesOfEvent);
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservations: $arrayReservations,images: $imagesOfEvent);
             }
             return $arrayDTOEvent;
         } catch (\Exception $e) {
@@ -150,7 +150,7 @@ class EventService
                     $arrayReservations[] = $arrayReservation;
                 }
                 $imagesOfEvent = $this->imageToEventRepository->getImageToEventByEventId(eventId: $event->id);
-                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservation: $arrayReservations,images: $imagesOfEvent);
+                $arrayDTOEvent[] = $this->eventFactory->createDynamic(event: $event,fields: ['id','title','startDate','endDate','maxReservation','ageRestriction','price'],userName: $userName,address: $arrayAddress,reservations: $arrayReservations,images: $imagesOfEvent);
             }
             return $arrayDTOEvent;
         } catch (\Exception $e) {
@@ -169,7 +169,8 @@ class EventService
                 if($uploadResult instanceof ResponseError){
                     return $uploadResult;
                 }
-                $imageToEvent = $this->imageToEventFactory->createFromArray(data: ['eventId' => $event->id,'fileName' => $imageName]);
+                $id = uniqid();
+                $imageToEvent = $this->imageToEventFactory->createFromArray(data: ['id' => $id,'eventId' => $event->id,'fileName' => $imageName]);
                 $this->imageToEventRepository->addImageToEvent(imageToEvent: $imageToEvent);
                 $images[] = $imageName;
             }

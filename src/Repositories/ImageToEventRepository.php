@@ -30,7 +30,7 @@ class ImageToEventRepository
     public function getImageToEventById(string $id): ImageToEvent|null
     {
         try{
-            $query = "SELECT * FROM images_to_events WHERE id = :id AND isDeleted = 0";
+            $query = "SELECT * FROM images_to_event WHERE id = :id AND isDeleted = 0";
             $stmt = $this->db->getConnection()->prepare( query: $query );
             $stmt->bindParam(param: ':id', var: $id);
             $stmt->execute();
@@ -71,7 +71,7 @@ class ImageToEventRepository
     public function getThumbnailImage(string $eventId): ImageToEvent|null
     {
         try{
-            $query = "SELECT * FROM images_to_events WHERE eventId = :eventId AND isThumbnail = 1";
+            $query = "SELECT * FROM images_to_event WHERE eventId = :eventId AND isThumbnail = 1";
             $stmt = $this->db->getConnection()->prepare( query: $query );
             $stmt->bindParam(param: ':eventId', var: $eventId);
             $stmt->execute();
@@ -93,7 +93,7 @@ class ImageToEventRepository
     {
         try{
             $imageToEvent->id = uniqid();
-            $query = "INSERT INTO images_to_events (id, eventId, fileName, isThumbnail) VALUES (:id, :eventId, :fileName, :isThumbnail)";
+            $query = "INSERT INTO images_to_event (id, eventId, fileName, isThumbnail) VALUES (:id, :eventId, :fileName, :isThumbnail)";
             $stmt = $this->db->getConnection()->prepare( query: $query );
             $stmt->bindParam(param: ':id', var: $imageToEvent->id);
             $stmt->bindParam(param: ':eventId', var: $imageToEvent->eventId);

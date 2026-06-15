@@ -94,7 +94,7 @@ class ImageService
                     src_height: $sourceHeight
                 );
 
-                $outputPath = rtrim(string: $sizeDirectory, characters: '/') . '/' . $fileName;
+                $outputPath = rtrim(string: $sizeDirectory, characters: '/') . '/' . $fileName . '.webp';
                 imagewebp(image: $newImage, file: $outputPath, quality: 80);
             }
             return true;

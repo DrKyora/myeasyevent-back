@@ -39,6 +39,20 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
                 $dependances->tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
             }
             break;
+        case 'addTemplate':
+            try{
+                $template = $dependances->templateFactory->createFromArray(data: (array) $request->template);
+                $newTemplate = $dependances->templateService->addTemplate(template: $template, images: $request->images, categories: $request->categories);
+                if(!$newTemplate instanceof ResponseError){
+                    $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Création du template réussie", 'data' => ['newTemplate' => $newTemplate]]);
+                } else {
+                    $error = $newTemplate;
+                    $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => $error->code, 'message' => $error->message]);
+                }
+            } catch (\Throwable $th) {
+                $dependances->tools->myErrorHandler(errno: $th->getCode(), errstr: $th->getMessage(), errfile: $th->getFile(), errline: $th->getLine());
+            }
+            break;
     }
 } else {
     $response = $dependances->responseFactory->createFromArray(data: ['status' => 'error', 'code' => 5009, 'message' => "Pas de session valable, l'utilisateur doit se reconnecter"]);
