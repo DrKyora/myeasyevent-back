@@ -15,7 +15,6 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
         case 'getAllTemplates':
             try{
                 $templates = $dependances->templateService->getAllTemplates();
-                $dependances->tools->logdebug(message: "Templates trouvés : " . json_encode($templates));
                 if(!$templates instanceof ResponseError){
                     $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Tous les templates trouvés", 'data' => ['templates' => $templates]]);
                 } else {
