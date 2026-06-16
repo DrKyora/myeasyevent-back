@@ -15,6 +15,7 @@ use App\Repositories\TemplateRepository;
 use App\Repositories\ImageToTemplateRepository;
 use App\Repositories\CategoryRepository;
 
+use App\Services\ImageService;
 use App\Validators\TemplateValidationService;
 use App\Validators\CategoryValidationService;
 
@@ -31,6 +32,7 @@ class TemplateService
     private CategoryRepository $categoryRepository;
     private TemplateValidationService $templateValidationService;
     private CategoryValidationService $categoryValidationService;
+    private ImageService $imageService;
 
     public function __construct(
         TemplateFactory $templateFactory,
@@ -41,7 +43,8 @@ class TemplateService
         ImageToTemplateRepository $imageToTemplateRepository,
         CategoryRepository $categoryRepository,
         TemplateValidationService $templateValidationService,
-        CategoryValidationService $categoryValidationService
+        CategoryValidationService $categoryValidationService,
+        ImageService $imageService
     ){
         $this->templateFactory = $templateFactory;
         $this->imageToTemplateFactory = $imageToTemplateFactory;
@@ -52,6 +55,7 @@ class TemplateService
         $this->categoryRepository = $categoryRepository;
         $this->templateValidationService = $templateValidationService;
         $this->categoryValidationService = $categoryValidationService;
+        $this->imageService = $imageService;
     }
 
     public function getAllTemplates(): array|ResponseError
@@ -61,7 +65,10 @@ class TemplateService
             $arrayDTOTemplate = [];
             $images = [];
             $categories = [];
+            $arrayDTOTemplate = [];
             foreach($templates as $template){
+                $images = [];
+                $categories = [];
                 $images[] = $this->imageToTemplateRepository->getThumbnailImage(templateId: $template->id);
                 $categories[] = $this->categoryRepository->getCategoriesOfTemplate(templateId: $template->id);
                 $DTOTemplate = $this->templateFactory->createDynamic(template: $template,fields: ['id','title','description'],images: $images,categories: $categories);
@@ -77,6 +84,8 @@ class TemplateService
     {
         try{
             $template = $this->templateRepository->getTemplateById(id: $id);
+            $images = [];
+            $categories = [];
             $images[] = $this->imageToTemplateRepository->getThumbnailImage(templateId: $template->id);
             $categories[] = $this->categoryRepository->getCategoriesOfTemplate(templateId: $template->id);
             $DTOTemplate = $this->templateFactory->createDynamic(template: $template,fields: ['id','title','html','description'],images: $images,categories: $categories);
@@ -91,12 +100,22 @@ class TemplateService
         try{
             $this->templateValidationService->validate(template: $template);
             $newTemplate = $this->templateRepository->addTemplate(template: $template);
+            
+            $imageNames = [];
             if($images){
                 foreach($images as $image){
-                    $newImage = $this->imageToTemplateFactory->createFromArray(data: ['templateId' => $newTemplate->id, 'fileName'=> $image]);
-                    $this->imageToTemplateRepository->addImageToTemplate(imageToTemplate: $newImage);
+                    $imageName = $newTemplate->id . '_' . random_int(min: 100000, max: 999999);
+                    $uploadResult = $this->imageService->resizeImage(base64: $image, fileName: $imageName, targetPath: __DIR__ . '/../../img/template/');
+                    if($uploadResult instanceof ResponseError){
+                        return $uploadResult;
+                    }
+                    $id = uniqid();
+                    $imageToTemplate = $this->imageToTemplateFactory->createFromArray(data: ['id' => $id, 'templateId' => $newTemplate->id, 'fileName' => $imageName], isThumbnail: false);
+                    $this->imageToTemplateRepository->addImageToTemplate(imageToTemplate: $imageToTemplate);
+                    $imageNames[] = $imageName;
                 }
             }
+            
             if($categories){
                 foreach($categories as $category){
                     $newCategory = $this->categoryFactory->createFromArray(data:['name' => $category]);
@@ -104,7 +123,7 @@ class TemplateService
                     $this->categoryRepository->addCategoryToTemplate(templateId: $newTemplate->id,categoryId: $newCategory->id);
                 }
             }
-            $DTOTemplate = $this->templateFactory->createDynamic(template: $template,fields: ['id','title','description'],images: $images,categories: $categories);
+            $DTOTemplate = $this->templateFactory->createDynamic(template: $newTemplate,fields: ['id','title','description'],images: $imageNames,categories: $categories);
             return $DTOTemplate;
         } catch (\Exception $e) {
             return $this->responseErrorFactory->createFromArray(data: ['code' => $e->getCode(), 'message' => $e->getMessage()]);

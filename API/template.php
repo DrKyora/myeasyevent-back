@@ -8,7 +8,6 @@ use App\Responses\ResponseError;
 $request = json_decode(json: file_get_contents(filename: 'php://input'));
 
 $dependances = new \App\Services\DépendancesContainer();
-
 if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->session)) {
     $sessionString = $dependances->tools->encrypt_decrypt(action: 'decrypt', stringToTreat: $request->session);
     $session = $dependances->sessionFactory->createFromJson(json: $sessionString);
@@ -16,6 +15,7 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
         case 'getAllTemplates':
             try{
                 $templates = $dependances->templateService->getAllTemplates();
+                $dependances->tools->logdebug(message: "Templates trouvés : " . json_encode($templates));
                 if(!$templates instanceof ResponseError){
                     $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Tous les templates trouvés", 'data' => ['templates' => $templates]]);
                 } else {
@@ -42,7 +42,7 @@ if ($dependances->sessionService->tokenSessionIsValide(tokenSession: $request->s
         case 'addTemplate':
             try{
                 $template = $dependances->templateFactory->createFromArray(data: (array) $request->template);
-                $newTemplate = $dependances->templateService->addTemplate(template: $template, images: $request->images, categories: $request->categories);
+                $newTemplate = $dependances->templateService->addTemplate(template: $template, images: (array) $request->images, categories: (array) $request->categories);
                 if(!$newTemplate instanceof ResponseError){
                     $response = $dependances->responseFactory->createFromArray(data: ['status' => 'success', 'code' => null, 'message' => "Création du template réussie", 'data' => ['newTemplate' => $newTemplate]]);
                 } else {

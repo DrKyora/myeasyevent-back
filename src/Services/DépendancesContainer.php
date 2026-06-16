@@ -232,7 +232,8 @@ class DépendancesContainer {
             imageToTemplateRepository: $this->imageToTemplateRepository,
             categoryRepository: $this->categoryRepository,
             templateValidationService: $this->templateValidationService,
-            categoryValidationService: $this->categoryValidationService
+            categoryValidationService: $this->categoryValidationService,
+            imageService: $this->imageService
         );
         
         $this->reservationService = new ReservationService(

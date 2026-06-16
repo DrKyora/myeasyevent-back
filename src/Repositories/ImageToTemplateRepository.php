@@ -66,7 +66,7 @@ class ImageToTemplateRepository
     public function getThumbnailImage(string $templateId): ImageToTemplate|null
     {
         try{
-            $query = "SELECT * FROM images_to_templates WHERE templateId = :templateId AND isThumbnail = 1";
+            $query = "SELECT * FROM images_to_templates WHERE templateId = :templateId";
             $stmt = $this->db->getConnection()->prepare( query: $query );
             $stmt->bindParam(param: ':templateId', var: $templateId);
             $stmt->execute();
@@ -94,7 +94,7 @@ class ImageToTemplateRepository
             $stmt->bindParam(param: ':id', var: $imageToTemplate->id);
             $stmt->bindParam(param: ':templateId', var: $imageToTemplate->templateId);
             $stmt->bindParam(param: ':fileName', var: $imageToTemplate->fileName);
-            $stmt->bindParam(param:':, :isThumbnail', var: $imageToTemplate->isThumbnail);
+            $stmt->bindParam(param: ':isThumbnail', var: $imageToTemplate->isThumbnail);
             $stmt->execute();
             return $imageToTemplate;
         } catch (\Exception $e) {
