@@ -201,7 +201,7 @@ class UserService
             if(!$user instanceof User){
                 return null;
             }
-            $user->isDeleted = true;
+            $user->isDeleted = 1;
             $this->userRepository->updateUser(user: $user);
             return true;
         } catch (\Exception $e) {
@@ -216,7 +216,7 @@ class UserService
             if(!$user instanceof User){
                 return null;
             }
-            $user->isDeleted = false;
+            $user->isDeleted = 0;
             $this->userRepository->updateUser(user: $user);
             return true;
         } catch (\Exception $e) {

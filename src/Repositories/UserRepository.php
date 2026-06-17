@@ -30,7 +30,7 @@ class UserRepository
     public function getUserById(string $id): User|null
     {
         try{
-            $query = "SELECT * FROM users WHERE id = :id AND isDeleted = 0";
+            $query = "SELECT * FROM users WHERE id = :id";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->bindParam(param:':id',var: $id);
             $stmt->execute();
@@ -72,7 +72,7 @@ class UserRepository
     public function getAllUsers(): array|null
     {
         try{
-            $query = "SELECT * FROM users WHERE isDeleted = 0";
+            $query = "SELECT * FROM users";
             $stmt = $this->db->getConnection()->prepare(query: $query);
             $stmt->execute();
             $users = [];
@@ -219,9 +219,13 @@ class UserRepository
                 $columnsToUpdate[] = "validateDate = :validateDate";
                 $parameters[":validateDate"] = $user->validateDate;
             }
+            if ($user->isAdmin !== null) {
+            $columnsToUpdate[] = "isAdmin = :isAdmin";
+            $parameters[":isAdmin"] = $user->isAdmin ? 1 : 0;
+            }
             if ($user->isDeleted !== null) {
                 $columnsToUpdate[] = "isDeleted = :isDeleted";
-                $parameters[":isDeleted"] = $user->isDeleted;
+                $parameters[":isDeleted"] = $user->isDeleted ? 1 : 0;
             }
             $query = "UPDATE users set " . implode(separator: ", ",array: $columnsToUpdate) . " WHERE id = :id";
             $stmt = $this->db->getConnection()->prepare(query: $query);
